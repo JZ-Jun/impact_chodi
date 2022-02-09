@@ -1,16 +1,29 @@
-import 'package:flutter/material.dart';
+import 'dart:core';
 
+
+
+import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'nonprofit.dart';
+import 'VolunteeringActivity.dart';
+import 'DonationActivity.dart';
+import 'activity.dart';
+import 'DetailPage.dart';
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes:{
+        DetailPage.routeName:(context) =>
+            const DetailPage(),
+
+      },
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -24,13 +37,13 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -42,74 +55,332 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-
+  
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late List<Nonprofits> _chartData;
+  late TooltipBehavior _tooltipBehavior;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    _chartData = getChartData();
+    _tooltipBehavior = TooltipBehavior(enable: true);
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+    List <Activity> activities= [VolunteeringActivity('Autism Speak',DateTime.utc(2021,11,15),Icon(Icons.extension_rounded),3),DonationActivity('Action in Africa',DateTime.utc(2021,10,25),Icon(Icons.support),20),
+  VolunteeringActivity('Lifewater',DateTime.utc(2021,9,15),Icon(Icons.water),5),DonationActivity('World Concern',DateTime.utc(2021,9,21),Icon(Icons.public),50)];
+
+    return Container(
+        child: Scaffold(
+            body: SingleChildScrollView(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+          SizedBox(height: 40),
+          Container(
+            child: Text("Hi Daniel,\nhere's your impact summary",
+                style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700)),
+          ),
+          SizedBox(height: 10),
+          Container(
+              height: 400,
+              width: 500,
+              child: SfCircularChart(
+                margin: EdgeInsets.all(0),
+                annotations: <CircularChartAnnotation>[
+                  CircularChartAnnotation(
+                      widget: Container(
+                          child: const Text("\n dollars \n\n hours",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 15))),
+                      radius: '0%',
+                      verticalAlignment: ChartAlignment.center)
+                  //horizontalAlignment: ChartAlignment.far)
+                ],
+                series: <CircularSeries>[
+                  DoughnutSeries<Nonprofits, String>(
+                      dataSource: getChartData(),
+                      pointColorMapper: (Nonprofits data, _) => data.color,
+                      xValueMapper: (Nonprofits data, _) => data.org,
+                      yValueMapper: (Nonprofits data, _) => data.impact,
+                      dataLabelSettings: DataLabelSettings(isVisible: true),
+                      explode: true,
+                      explodeAll: true,
+                      explodeOffset: "2%")
+                  //enableTooltip: true)
+                  //maximumValue: 40000)
+                ],
+                legend: Legend(
+                    orientation: LegendItemOrientation.horizontal,
+                    padding: 5,
+                    isVisible: true,
+                    overflowMode: LegendItemOverflowMode.wrap,
+                    position: LegendPosition.bottom,
+                    textStyle: TextStyle(fontSize: 16)),
+                tooltipBehavior: _tooltipBehavior,
+              )),
+          SizedBox(height: 20),
+          Container(
+            child: Text("Milestone Breakdown",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700)),
+          ),
+          SizedBox(height: 20),
+          Container(
+              height: 250,
+              width: 400,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                color: Colors.orangeAccent,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  //crossAxisAlignment: CrossAxisAlignment.baseline,
+                  //textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    SizedBox(height: 40),
+                    Row(children: [
+                      SizedBox(width: 25),
+                      Text(
+                        'Volunteer',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 75),
+                      Text(
+                        'Remaining',
+                        style: TextStyle(
+                            color: Colors.brown[900],
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ]),
+                    SizedBox(height: 30),
+                    Row(
+                      children: [
+                        SizedBox(width: 40),
+                        Text('40.0',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40,
+                                fontWeight: FontWeight.w700)),
+                        SizedBox(width: 15),
+                        Text('hours',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            )),
+                        SizedBox(width: 90),
+                        Text('20.0',
+                            style: TextStyle(
+                                color: Colors.brown[900],
+                                fontSize: 35,
+                                fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Stack(fit: StackFit.loose, children: [
+                      Container(
+                        alignment: Alignment.center,
+                        height: 50,
+                        width: 370,
+                        child: Center(
+                          child: SfLinearGauge(
+                            axisTrackStyle: LinearAxisTrackStyle(
+                              thickness: 25,
+                              edgeStyle: LinearEdgeStyle.bothCurve,
+                              color: Colors.brown[900],
+                            ),
+                            showLabels: false,
+                            showTicks: false,
+                            barPointers: [
+                              LinearBarPointer(
+                                  thickness: 25,
+                                  value: 80,
+                                  edgeStyle: LinearEdgeStyle.bothCurve,
+                                  //Change the color
+                                  color: Colors.white)
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 200),
+                      Container(
+                          alignment: Alignment.center,
+                          height: 50,
+                          width: 200,
+                          child: Text('2 weeks left to complete!',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500))),
+                      Column(children: [
+                        Container(
+                            alignment: Alignment.centerRight,
+                            height: 50,
+                            width: 350,
+                            child: Text('80%',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500))),
+                      ]),
+                    ]),
+                    Stack(
+                      children: [
+                        SizedBox(width: 50),
+                        Container(
+                          alignment: Alignment.center,
+                          child: Text('monthly goal\t\t60 dollars',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700)),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              )),
+          SizedBox(height: 20),
+          Container(
+            child: Text("Recent History",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700)),
+          ),
+          //SizedBox(height: 10),
+          Container(
+              height: 400,
+              padding: const EdgeInsets.all(5.0),
+              alignment: Alignment.center,
+              child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  color: Colors.white70,
+                  elevation: 10,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children:List.generate(activities.length*2-1,(index){
+                      if (index.isOdd){
+                        return const Divider();
+                      }
+                      if (index==0){
+            return _buildRow(activities[index]);}
+            int i = (index - (index~/2)) as int;
+            return _buildRow(activities[i]);
+          }),
+          ))),
+          //SizedBox(height: 5),
+          Container(
+            child: Text("Badges",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700)),
+          ),
+          SizedBox(height: 10),
+          Container(
+            height: 125,
+            padding: EdgeInsets.all(15.0),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: <Widget>[
+                Container(
+                  width: 110,
+                  color: Colors.grey,
+                  child: const Center(
+                      child: Text(
+                    'Badge 1',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  )),
+                ),
+                SizedBox(width: 25),
+                Container(
+                  width: 110,
+                  color: Colors.grey,
+                  child: const Center(
+                      child: Text(
+                    'Badge 2',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  )),
+                ),
+                SizedBox(width: 25),
+                Container(
+                  width: 110,
+                  color: Colors.grey,
+                  child: const Center(
+                      child: Text(
+                    'Badge 3',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  )),
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+          ),
+        ])
+        ))
+        );
+  }
+  Widget _buildRow(Activity a) {
+    Color fontcolor = Colors.green;
+    Activity? arg; 
+    if(a is VolunteeringActivity)
+    {
+      fontcolor = Colors.orange;
+      arg = VolunteeringActivity(a.org,a.date,a.icon,(a as VolunteeringActivity).hours,);
+    }else if(a is DonationActivity)
+    {
+      arg = DonationActivity(a.org,a.date,a.icon,(a as DonationActivity).dollars);
+    }
+
+    return ListTile(
+      onTap:(){
+                          Navigator.pushNamed(context, DetailPage.routeName,
+                          arguments:arg,);
+                        },
+      title:  Text(a.org,
+                            style: TextStyle(fontWeight: FontWeight.w500)),
+                        leading: a.icon,
+                        subtitle:  Text(a.org),
+                        trailing:  Text(((){
+                          if(a is DonationActivity)
+                          {
+                          return (a as DonationActivity).dollars.toStringAsPrecision(2) +' dollars';}
+                          return (a as VolunteeringActivity).hours.toString()+' hours';
+                          }()),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: fontcolor)),
+                      );
+  }
+
+  List<Nonprofits> getChartData() {
+    final List<Nonprofits> chartData = [
+      Nonprofits('Education', 50, Colors.deepPurple),
+      Nonprofits('Cultural', 25, Colors.red),
+      Nonprofits('Health', 15, Colors.teal),
+      Nonprofits('Environment', 5, Colors.yellowAccent),
+    ];
+    return chartData;
   }
 }
+
