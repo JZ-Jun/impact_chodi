@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/screens/user/user_initialize_screen.dart';
+import 'package:flutter_chodi_app/services/google_authentication_service/log_out_button.dart';
 
 import '../services/shared_preferences_service.dart';
 
@@ -21,7 +22,8 @@ class _HomeScreenState extends State<HomeSrceen> {
         children: [
           const Text("homeScreen"),
           GestureDetector(
-            child: const Text("sign out"),
+            child:
+                const logOutWidget(), //log out function logs people from google and firebase
             onTap: () {
               SharedPreferencesService sharedPreferencesService =
                   SharedPreferencesService.instance;
