@@ -4,12 +4,14 @@ import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/screens/home_screen.dart';
 import 'package:flutter_chodi_app/screens/user/forgot_password_email_screen.dart';
 import 'package:flutter_chodi_app/screens/user/sign_up_screen.dart';
+import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:flutter_chodi_app/services/google_authentication_service/google_authentication.dart';
 import 'package:flutter_chodi_app/services/shared_preferences_service.dart';
 import 'package:flutter_chodi_app/services/sqlite_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widget/chodi_text.dart';
 
@@ -93,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: userNameController,
                           decoration: const InputDecoration(
                               contentPadding: EdgeInsets.only(left: 3),
-                              hintText: 'Email/Username',
+                              hintText: 'Email',
                               isDense: true,
                               border: InputBorder.none),
                         ),
@@ -241,6 +243,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         onTap: () {
+                          final provider = Provider.of<FirebaseService>(context,
+                              listen: false);
+
+                          provider.userSignIn(
+                              userNameController.text, passwordController.text);
+
+                          if (_rememberMe) {
+                            //idk what to do here
+                            /*
+                            SharedPreferencesService.instance
+                                                .setUserId(value.id as int)
+                            */
+                          }
+
+                          /*
                           service
                               .getUser(userNameController.text.toString(),
                                   userNameController.text.toString())
@@ -267,6 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             (route) => false)
                                       }
                                   });
+                                  */
                         },
                       ),
                       Expanded(

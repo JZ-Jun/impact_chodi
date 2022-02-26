@@ -52,9 +52,10 @@ class GoogleAuthentication extends ChangeNotifier {
 
     if (authResult.additionalUserInfo!.isNewUser) {
       //add initial data fields to Firebase here if a new user has signed in
-      //addGoogleUserData(credential.idToken);
-
+      addGoogleUserData(credential.idToken);
       log("New user!"); //TO DELETE LATER
+    } else {
+      updateGoogleUserData(); //for testing
     }
 
     notifyListeners();
@@ -75,28 +76,56 @@ class GoogleAuthentication extends ChangeNotifier {
     });
   }
 
-  //sign out funciton implemented for Google
+  //sign out function implemented for Google
   Future signOutWithGoogle() async {
     await _googleSignIn.disconnect();
     await _googleSignIn.signOut(); //sign out from google
     await _auth.signOut(); //sign out from firebase
   }
 
-  //add user to Firebase
+  //update user to firebase (eventually using the User)
   Future addGoogleUserData(String? idToken) async {
     //CHANGE THIS TO FIT THE CHODI DATABASE LATER
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      CollectionReference chodiUsers = FirebaseFirestore.instance
-          .collection('EndUsers'); //change to different collection
+      CollectionReference chodiUsers =
+          FirebaseFirestore.instance.collection('EndUsers');
 
       Map<String, dynamic>? idMap = getGivenAndFamilyName(idToken!);
 
-      chodiUsers.add({
+      //this method should work!
+      await chodiUsers.doc(user.uid).set({
+        /*
         "Email": user.email,
         "Username": user.displayName,
         "FirstName": idMap!["given_name"],
         "LastName": idMap["family_name"],
+        */
+
+        "Email": 'example@gmail.com',
+        "Username": 'exampleName',
+        "FirstName": 'examplefirstname',
+        "LastName": 'examplelastname',
+
+        //after logging, redirect to another page, (use if condition to decide) then update the values.
+        //Delete account if incompleted.
+      });
+    }
+  }
+
+  Future updateGoogleUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      CollectionReference chodiUsers =
+          FirebaseFirestore.instance.collection('EndUsers');
+
+      await chodiUsers.doc(user.uid).set({
+        "Email": "updated@gmail.com",
+        "Password": "password",
+        "Username": "firstName",
+        "Age": '0',
+        "SecurityQuestion": "a?",
+        "SecurityQuestionAnswer": "a",
       });
     }
   }

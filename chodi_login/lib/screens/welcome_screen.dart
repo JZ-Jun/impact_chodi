@@ -40,8 +40,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 {
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeSrceen()),
+                      MaterialPageRoute(builder: (context) => HomeSrceen()),
                       (route) => false)
                 }
             });

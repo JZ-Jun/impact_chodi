@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/models/user.dart';
-import 'package:flutter_chodi_app/services/sqlite_service.dart';
+import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import 'login_screen.dart';
 
@@ -23,7 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late TextEditingController securityQuestionController;
   late TextEditingController securityQuestionAnswerController;
 
-  SqliteService service = SqliteService.instance;
+  FirebaseService fbservice = FirebaseService();
 
   @override
   void initState() {
@@ -373,33 +374,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       _showToast("email error");
                     } else if (!_checkPassword()) {
                       _showToast("password error");
+                    } else if (passwordController.text.length < 6) {
+                      _showToast("password must be min 6 character long");
                     } else if (!_checkboxValue) {
                       _showToast("Please agree to the terms and privacy");
                     } else {
-                      service
-                          .getUser(
-                              emailController.text, userNameController.text)
-                          .then((value) {
-                        if (value.id == null) {
-                          service.insertUser(User(
-                              email: emailController.text,
-                              userName: userNameController.text,
-                              age: int.parse(ageController.text),
-                              password: passwordController.text,
-                              securityQuestionAnswer:
-                                  securityQuestionAnswerController.text,
-                              securityQuestion:
-                                  securityQuestionController.text));
-                          _showToast("success");
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()),
-                              (route) => false);
-                        } else {
-                          _showToast("account already exists");
-                        }
-                      });
+                      User user = User(
+                          email: emailController.text,
+                          userName: userNameController.text,
+                          age: int.parse(ageController.text),
+                          password: passwordController.text,
+                          securityQuestionAnswer:
+                              securityQuestionAnswerController.text,
+                          securityQuestion: securityQuestionController.text);
+
+                      final provider =
+                          Provider.of<FirebaseService>(context, listen: false);
+                      provider.userSignUp(user, context);
                     }
                   },
                 ),
@@ -436,6 +427,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  //should be fixed later. Emails such as uciID@gmail.edy or uciID@gmail.e get accepted.
   bool _validateEmail() {
     String pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
