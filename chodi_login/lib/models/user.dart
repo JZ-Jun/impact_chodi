@@ -3,9 +3,9 @@ class User {
   String? email;
   String? userName;
   int? age;
-  String? password;
   String? securityQuestion;
   String? securityQuestionAnswer;
+  String? password;
 
   Map<String, Object?> toMap() {
     var map = <String, Object?>{
@@ -13,29 +13,30 @@ class User {
       'email': email,
       'userName': userName,
       'age': age,
-      'password': password,
       'securityQuestion': securityQuestion,
-      'securityQuestionAnswer': securityQuestionAnswer
+      'securityQuestionAnswer': securityQuestionAnswer,
+      'password': password,
     };
     return map;
   }
 
-  User(
-      {this.id,
-      this.email,
-      this.userName,
-      this.age,
-      this.password,
-      this.securityQuestion,
-      this.securityQuestionAnswer});
+  User({
+    this.id,
+    required this.email,
+    required this.userName,
+    this.age,
+    this.securityQuestion,
+    this.securityQuestionAnswer,
+    this.password,
+  });
 
   User.fromMap(Map<dynamic, dynamic> map) {
     id = map['id'] as int?;
     email = map['email'] as String?;
     userName = map['userName'] as String?;
     age = map['age'] as int?;
-    password = map['password'] as String?;
     securityQuestion = map['securityQuestion'] as String?;
     securityQuestionAnswer = map['securityQuestionAnswer'] as String?;
+    password = map['password'] as String?;
   }
 }

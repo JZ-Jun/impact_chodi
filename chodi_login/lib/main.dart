@@ -33,3 +33,17 @@ class MyApp extends StatelessWidget {
         ),
       );
 }
+
+/*
+hangeNotifierProvider(
+        create: (context) =>
+            GoogleAuthentication(), //change context to include all authentication?
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const WelcomeScreen(),
+        ),
+      );
+*/

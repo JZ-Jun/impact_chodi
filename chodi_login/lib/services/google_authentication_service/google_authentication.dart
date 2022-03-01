@@ -78,9 +78,14 @@ class GoogleAuthentication extends ChangeNotifier {
 
   //sign out function implemented for Google
   Future signOutWithGoogle() async {
-    await _googleSignIn.disconnect();
-    await _googleSignIn.signOut(); //sign out from google
-    await _auth.signOut(); //sign out from firebase
+    final list = await _auth.currentUser!.providerData;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].providerId == 'google.com') {
+        await _googleSignIn.disconnect();
+        await _googleSignIn.signOut(); //sign out from google
+        await _auth.signOut(); //sign out from firebase
+      }
+    }
   }
 
   //update user to firebase (eventually using the User)
@@ -102,10 +107,8 @@ class GoogleAuthentication extends ChangeNotifier {
         "LastName": idMap["family_name"],
         */
 
-        "Email": 'example@gmail.com',
+        "Email": user.email,
         "Username": 'exampleName',
-        "FirstName": 'examplefirstname',
-        "LastName": 'examplelastname',
 
         //after logging, redirect to another page, (use if condition to decide) then update the values.
         //Delete account if incompleted.
@@ -120,10 +123,10 @@ class GoogleAuthentication extends ChangeNotifier {
           FirebaseFirestore.instance.collection('EndUsers');
 
       await chodiUsers.doc(user.uid).set({
-        "Email": "updated@gmail.com",
+        "Email": user.email,
         "Password": "password",
         "Username": "firstName",
-        "Age": '0',
+        "Age": "0",
         "SecurityQuestion": "a?",
         "SecurityQuestionAnswer": "a",
       });

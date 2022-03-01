@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:provider/provider.dart';
 import 'google_authentication.dart';
+//import 'package:flutter_chodi_app/services/firebase_service.dart';
 
 //Create a text link to log out of Chodi*/
 
@@ -13,6 +15,8 @@ class logOutWidget extends StatefulWidget {
 }
 
 class _logOutWidgetState extends State<logOutWidget> {
+  FirebaseService fbservice = FirebaseService();
+
   @override
   Widget build(BuildContext context) {
     TextStyle googleLinkTextStyle = TextStyle(
@@ -22,7 +26,7 @@ class _logOutWidgetState extends State<logOutWidget> {
     );
 
     return Container(
-      margin: EdgeInsets.only(bottom: 20), //margin padding
+      margin: const EdgeInsets.only(bottom: 20), //margin padding
       child: Align(
         alignment: Alignment.bottomCenter,
         child: RichText(
@@ -31,9 +35,15 @@ class _logOutWidgetState extends State<logOutWidget> {
               style: googleLinkTextStyle,
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  final provider =
+                  //if google user
+                  final provider1 =
                       Provider.of<GoogleAuthentication>(context, listen: false);
-                  provider.googleLogOut();
+                  provider1.googleLogOut();
+
+                  //if regular user
+                  final provider2 =
+                      Provider.of<FirebaseService>(context, listen: false);
+                  provider2.userLogOut(context);
                 }),
         ),
       ),

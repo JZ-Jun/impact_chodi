@@ -383,10 +383,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           email: emailController.text,
                           userName: userNameController.text,
                           age: int.parse(ageController.text),
-                          password: passwordController.text,
                           securityQuestionAnswer:
                               securityQuestionAnswerController.text,
-                          securityQuestion: securityQuestionController.text);
+                          securityQuestion: securityQuestionController.text,
+                          password: passwordController.text);
 
                       final provider =
                           Provider.of<FirebaseService>(context, listen: false);

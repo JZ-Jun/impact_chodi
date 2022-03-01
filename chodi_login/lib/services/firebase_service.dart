@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,7 @@ class FirebaseService extends ChangeNotifier {
     Map<String, Object?> userMap = user.toMap();
     String email = userMap["email"].toString();
     String password = userMap["password"].toString();
-    String username = userMap["username"].toString();
+    String username = userMap["userName"].toString();
     String age = userMap["age"].toString();
     String securityQuestion = userMap["securityQuestion"].toString();
     String securityQuestionAnswer =
@@ -32,7 +34,6 @@ class FirebaseService extends ChangeNotifier {
                         .doc(credential.user!.uid)
                         .set({
                       "Email": email,
-                      "Password": password,
                       "Username": username,
                       "Age": age,
                       "SecurityQuestion": securityQuestion,
@@ -64,26 +65,12 @@ class FirebaseService extends ChangeNotifier {
         MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 
-  Future resetPassword(String email, BuildContext context) async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()));
-
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      _showToast("Password Reset Email was sent");
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    } on FirebaseAuth catch (e) {
-      Navigator.of(context).pop();
-      _showToast("account does not exist");
-    }
-  }
-
   Future<bool> checkIfEmailExistsInFirebase(String email) async {
     try {
       // Fetch sign-in methods for the email address
       final list = await _auth.fetchSignInMethodsForEmail(email);
+
+      debugPrint(list[0]);
 
       // In case list is not empty
       if (list.isNotEmpty) {
@@ -94,8 +81,23 @@ class FirebaseService extends ChangeNotifier {
         return false;
       }
     } catch (error) {
-      _showToast("error");
-      return true;
+      return false;
+    }
+  }
+
+  Future resetPassword(String email, BuildContext context) async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()));
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      _showToast("Password Reset Email Sent");
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop();
+      _showToast("Account does not exist");
     }
   }
 
@@ -109,32 +111,94 @@ class FirebaseService extends ChangeNotifier {
               .doc(userId)
               .get();
 
-      final chodiUser = ChodiUser.User(
-        email: personalInfo["Email"],
-        userName: personalInfo["Username"],
-        age: int.parse(personalInfo['Age']),
-        password: '',
-        securityQuestionAnswer: personalInfo["SecurityQuestionAnswer"],
-        securityQuestion: personalInfo["SecurityQuestion"],
-      );
-      return chodiUser;
+      try {
+        final chodiUser = ChodiUser.User(
+          email: personalInfo["Email"],
+          userName: personalInfo["Username"],
+          age: int.parse(personalInfo['Age']),
+          securityQuestionAnswer: personalInfo["SecurityQuestionAnswer"],
+          securityQuestion: personalInfo["SecurityQuestion"],
+        );
+        return chodiUser;
+        //The age, securityQuestionAnswer, and securityQuestion fields are nonexistent
+      } on TypeError {
+        final chodiUser = ChodiUser.User(
+          email: personalInfo["Email"],
+          userName: personalInfo["Username"],
+        );
+        return chodiUser;
+      }
     }
     return null;
   }
 
-  Future getDataOfUserGivenEmail(String email) async {
-    await checkIfEmailExistsInFirebase(email).then((value) => {});
+  //When the user is not currently logged in but needs information based on the email
+  Future<ChodiUser.User?> getDataOfUserGivenEmail(String email) async {
+    if (await checkIfEmailExistsInFirebase(email)) {
+      CollectionReference securityQuestionData =
+          FirebaseFirestore.instance.collection("EndUsers");
+
+      QuerySnapshot querySnapshot = await securityQuestionData.get();
+
+      //turn into List
+      List<dynamic> allData =
+          querySnapshot.docs.map((doc) => doc.data()).toList();
+
+      //only 1 email per chodi account
+      for (var i = 0; i < allData.length; i++) {
+        if (allData[i]['Email'] == email) {
+          final list = await _auth.fetchSignInMethodsForEmail(email);
+
+          //search login provider: google.com
+          for (var pIndex = 0; pIndex < list.length; pIndex++) {
+            //if email is not google-authenticated
+            if (list[pIndex] != 'google.com') {
+              try {
+                final chodiUser = ChodiUser.User(
+                  email: allData[i]["Email"],
+                  userName: allData[i]["Username"],
+                  age: int.parse(allData[i]['Age']),
+                  securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
+                  securityQuestion: allData[i]["SecurityQuestion"],
+                );
+                return chodiUser;
+              } on TypeError {
+                //type error with age
+                final chodiUser = ChodiUser.User(
+                  email: allData[i]["Email"],
+                  userName: allData[i]["Username"],
+                  age: int.parse(allData[i]['Age'].toString()),
+                  securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
+                  securityQuestion: allData[i]["SecurityQuestion"],
+                );
+                return chodiUser;
+              }
+            }
+          }
+        }
+      }
+    }
 
     return null;
   }
 
-  Future<String> getSecurityQuestion() async {
-    //this function doesn't work currently because the user isn't logged in
-    //so we need to create a function that gets the user data given a user uid
-    ChodiUser.User? user = await getDataOfCurrentUser();
-    Map<String, Object?> userMap = user!.toMap();
-    String securityQuestion = userMap["securityQuestion"].toString();
-    return securityQuestion;
+  //return a map containing the security question and security question answer
+  //When user is not currently logged in
+  Future<Map<String, dynamic>> getSecurityQuestionAndAnswer(
+      String email) async {
+    if (await getDataOfUserGivenEmail(email) != null) {
+      ChodiUser.User? user = await getDataOfUserGivenEmail(email);
+      Map<String, Object?> userMap = user!.toMap();
+      String securityQuestion = userMap["securityQuestion"].toString();
+      String securityQuestionAnswer =
+          userMap["securityQuestionAnswer"].toString();
+      return {
+        "securityQuestion": securityQuestion,
+        "securityQuestionAnswer": securityQuestionAnswer
+      };
+    }
+
+    return {"securityQuestion": null, "securityQuestionAnswer": null};
   }
 
   Future<String> getUsername() async {

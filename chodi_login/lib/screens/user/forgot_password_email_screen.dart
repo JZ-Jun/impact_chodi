@@ -17,7 +17,7 @@ class ForgotPasswordEmailScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
-  SqliteService sqliteService = SqliteService.instance;
+  //SqliteService sqliteService = SqliteService.instance;
   FirebaseService fbservice = FirebaseService();
   late TextEditingController emailController;
   late User user;
@@ -138,8 +138,8 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                const ForgotSecurityQuestionScreen()));
+                            builder: (context) => ForgotSecurityQuestionScreen(
+                                email: emailController.text)));
                   } else {
                     _showToast("Invalid email");
                   }

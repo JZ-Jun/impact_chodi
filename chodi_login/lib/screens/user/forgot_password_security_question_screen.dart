@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/screens/user/reset_password_srceen.dart';
+//import 'package:flutter_chodi_app/screens/user/reset_password_srceen.dart';
 import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -8,7 +9,11 @@ import '../../models/user.dart';
 import '../../widget/strip_guide_widget.dart';
 
 class ForgotSecurityQuestionScreen extends StatefulWidget {
-  const ForgotSecurityQuestionScreen({Key? key}) : super(key: key);
+  final String email; //store email
+
+  //This page requires an email input
+  const ForgotSecurityQuestionScreen({Key? key, required this.email})
+      : super(key: key);
 
   @override
   _ForgotSecurityQuestionScreenState createState() =>
@@ -20,7 +25,7 @@ class _ForgotSecurityQuestionScreenState
   late User? user = ModalRoute.of(context)?.settings.arguments as User?;
   late TextEditingController securityQuestionController;
   late TextEditingController securityQuestionAnswerController;
-  FirebaseService fbservice = new FirebaseService();
+  FirebaseService fbservice = FirebaseService();
 
   @override
   void initState() {
@@ -29,15 +34,16 @@ class _ForgotSecurityQuestionScreenState
     securityQuestionAnswerController = TextEditingController();
   }
 
-  Future<String> getSecurityQuestion() async {
-    //String question = await FirebaseService().getSecurityQuestion();
-    String question = "What is your favorite letter?";
+  Future<Map<String, dynamic>> getSecurityQuestion() async {
+    Future<Map<String, dynamic>> question =
+        FirebaseService().getSecurityQuestionAndAnswer(widget.email);
+
     return Future.delayed(const Duration(seconds: 1), () => question);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
+    return FutureBuilder<Map<String, dynamic>>(
       future: getSecurityQuestion(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -132,7 +138,7 @@ class _ForgotSecurityQuestionScreenState
                           decoration: InputDecoration(
                               contentPadding: const EdgeInsets.only(left: 3),
                               isDense: true,
-                              hintText: snapshot.data,
+                              hintText: snapshot.data!["securityQuestion"],
                               border: InputBorder.none),
                         )),
                     const Padding(
@@ -180,13 +186,13 @@ class _ForgotSecurityQuestionScreenState
                           ),
                         ),
                         onTap: () {
-                          if (user?.securityQuestionAnswer ==
+                          if (snapshot.data!["securityQuestionAnswer"] ==
                               securityQuestionAnswerController.text) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const ResetPasswordScreen(),
+                                      ResetPasswordScreen(email: widget.email),
                                   settings: RouteSettings(arguments: user)),
                             );
                           } else {

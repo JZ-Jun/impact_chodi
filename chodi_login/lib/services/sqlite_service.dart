@@ -1,3 +1,4 @@
+/*
 import 'package:flutter_chodi_app/models/user.dart';
 
 import 'package:sqflite/sqflite.dart';
@@ -65,3 +66,4 @@ class SqliteService {
 
   Future close() async => dataBase.close();
 }
+*/
