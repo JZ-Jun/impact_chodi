@@ -2,7 +2,7 @@ class User {
   int? id;
   String? email;
   String? userName;
-  int? age;
+  String? age;
   String? securityQuestion;
   String? securityQuestionAnswer;
   String? password;
@@ -34,7 +34,7 @@ class User {
     id = map['id'] as int?;
     email = map['email'] as String?;
     userName = map['userName'] as String?;
-    age = map['age'] as int?;
+    age = map['age'] as String?;
     securityQuestion = map['securityQuestion'] as String?;
     securityQuestionAnswer = map['securityQuestionAnswer'] as String?;
     password = map['password'] as String?;

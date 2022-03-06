@@ -8,7 +8,7 @@ import 'dart:developer'; //for printing
 //This class should handle the process for logging in using google
 
 /*
-notes for Google Authentication 
+notes for Google Authentication - February 2022
 -follow firebase set-up instructions, enable google in firebase
     -need google-services.json file in /android/app
     -SHA-1 Certificate fingerprints for debug
@@ -55,7 +55,7 @@ class GoogleAuthentication extends ChangeNotifier {
       addGoogleUserData(credential.idToken);
       log("New user!"); //TO DELETE LATER
     } else {
-      updateGoogleUserData(); //for testing
+      //updateGoogleUserData();
     }
 
     notifyListeners();
@@ -78,7 +78,7 @@ class GoogleAuthentication extends ChangeNotifier {
 
   //sign out function implemented for Google
   Future signOutWithGoogle() async {
-    final list = await _auth.currentUser!.providerData;
+    final list = _auth.currentUser!.providerData;
     for (var i = 0; i < list.length; i++) {
       if (list[i].providerId == 'google.com') {
         await _googleSignIn.disconnect();
@@ -108,7 +108,10 @@ class GoogleAuthentication extends ChangeNotifier {
         */
 
         "Email": user.email,
-        "Username": 'exampleName',
+        "Username": user.displayName,
+        "Age": null,
+        "SecurityQuestion": null,
+        "SecurityQuestionAnswer": null,
 
         //after logging, redirect to another page, (use if condition to decide) then update the values.
         //Delete account if incompleted.
@@ -116,6 +119,7 @@ class GoogleAuthentication extends ChangeNotifier {
     }
   }
 
+/*
   Future updateGoogleUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -124,14 +128,11 @@ class GoogleAuthentication extends ChangeNotifier {
 
       await chodiUsers.doc(user.uid).set({
         "Email": user.email,
-        "Password": "password",
-        "Username": "firstName",
-        "Age": "0",
-        "SecurityQuestion": "a?",
-        "SecurityQuestionAnswer": "a",
+        "Username": user.displayName,
       });
     }
   }
+  */
 
   //get "given_name" and "family_name" using idtoken
   static Map<String, dynamic>? getGivenAndFamilyName(String token) {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/screens/welcome_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_chodi_app/services/google_authentication_service/google_authentication.dart';
+import 'package:flutter_chodi_app/services/firebase_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,17 +33,3 @@ class MyApp extends StatelessWidget {
         ),
       );
 }
-
-/*
-hangeNotifierProvider(
-        create: (context) =>
-            GoogleAuthentication(), //change context to include all authentication?
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: const WelcomeScreen(),
-        ),
-      );
-*/

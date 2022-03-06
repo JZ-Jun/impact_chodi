@@ -44,8 +44,8 @@ class FirebaseService extends ChangeNotifier {
 
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomeSrceen()));
-    } on Exception catch (e) {
-      _showToast("email account is already in use");
+    } on Exception {
+      _showToast("Email account is already in use");
     }
 
     notifyListeners();
@@ -54,7 +54,7 @@ class FirebaseService extends ChangeNotifier {
   Future userSignIn(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       _showToast("Invalid email or password");
     }
   }
@@ -62,7 +62,7 @@ class FirebaseService extends ChangeNotifier {
   Future userLogOut(BuildContext context) async {
     await _auth.signOut();
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => LoginScreen()));
+        MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 
   Future<bool> checkIfEmailExistsInFirebase(String email) async {
@@ -95,7 +95,7 @@ class FirebaseService extends ChangeNotifier {
       await _auth.sendPasswordResetEmail(email: email);
       _showToast("Password Reset Email Sent");
       Navigator.of(context).popUntil((route) => route.isFirst);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       Navigator.of(context).pop();
       _showToast("Account does not exist");
     }
@@ -103,7 +103,7 @@ class FirebaseService extends ChangeNotifier {
 
   Future<ChodiUser.User?> getDataOfCurrentUser() async {
     if (_auth.currentUser != null) {
-      String userId = await _auth.currentUser!.uid;
+      String userId = _auth.currentUser!.uid;
 
       DocumentSnapshot<Map<String, dynamic>> personalInfo =
           await FirebaseFirestore.instance
@@ -111,20 +111,21 @@ class FirebaseService extends ChangeNotifier {
               .doc(userId)
               .get();
 
-      try {
+      if (personalInfo['Age'] == null ||
+          (personalInfo["SecurityQuestionAnswer"] == null ||
+              personalInfo['SecurityQuestion'] == null)) {
         final chodiUser = ChodiUser.User(
           email: personalInfo["Email"],
           userName: personalInfo["Username"],
-          age: int.parse(personalInfo['Age']),
-          securityQuestionAnswer: personalInfo["SecurityQuestionAnswer"],
-          securityQuestion: personalInfo["SecurityQuestion"],
         );
         return chodiUser;
-        //The age, securityQuestionAnswer, and securityQuestion fields are nonexistent
-      } on TypeError {
+      } else {
         final chodiUser = ChodiUser.User(
           email: personalInfo["Email"],
           userName: personalInfo["Username"],
+          age: personalInfo['Age'],
+          securityQuestionAnswer: personalInfo["SecurityQuestionAnswer"],
+          securityQuestion: personalInfo["SecurityQuestion"],
         );
         return chodiUser;
       }
@@ -157,7 +158,7 @@ class FirebaseService extends ChangeNotifier {
                 final chodiUser = ChodiUser.User(
                   email: allData[i]["Email"],
                   userName: allData[i]["Username"],
-                  age: int.parse(allData[i]['Age']),
+                  age: allData[i]['Age'],
                   securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
                   securityQuestion: allData[i]["SecurityQuestion"],
                 );
@@ -167,7 +168,7 @@ class FirebaseService extends ChangeNotifier {
                 final chodiUser = ChodiUser.User(
                   email: allData[i]["Email"],
                   userName: allData[i]["Username"],
-                  age: int.parse(allData[i]['Age'].toString()),
+                  age: allData[i]['Age'],
                   securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
                   securityQuestion: allData[i]["SecurityQuestion"],
                 );

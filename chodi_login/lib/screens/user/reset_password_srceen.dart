@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/models/user.dart';
 import 'package:flutter_chodi_app/screens/user/login_screen.dart';
 import 'package:flutter_chodi_app/services/firebase_service.dart';
-import 'package:flutter_chodi_app/services/sqlite_service.dart';
 
 import '../../configs/app_theme.dart';
 import '../../widget/strip_guide_widget.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String email;
-
   const ResetPasswordScreen({Key? key, required this.email}) : super(key: key);
+  final String email;
 
   @override
   _ResetPasswordScreenState createState() => _ResetPasswordScreenState();

@@ -15,8 +15,11 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  String? ageValue;
+  List<String> ageList = _createAgeList();
+
   bool _checkboxValue = false;
-  late TextEditingController ageController;
+
   late TextEditingController emailController;
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
@@ -33,10 +36,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
     userNameController = TextEditingController();
-    ageController = TextEditingController();
     securityQuestionController = TextEditingController();
     securityQuestionAnswerController = TextEditingController();
   }
+
+  DropdownMenuItem<String> buildMenuItem(String ageValue) => DropdownMenuItem(
+      value: ageValue,
+      child: Text(ageValue, style: const TextStyle(color: AppTheme.fontColor)));
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           decoration: const InputDecoration(
                               contentPadding: EdgeInsets.only(left: 3),
                               isDense: true,
-                              hintText: 'Enter your user name',
+                              hintText: 'Enter your username',
                               border: InputBorder.none),
                         )),
                     const Padding(
@@ -155,24 +161,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.only(left: 16),
+                        padding: const EdgeInsets.only(left: 16, right: 16),
                         height: 38,
                         decoration: const BoxDecoration(
                             color: AppTheme.editTextColors,
                             borderRadius:
                                 BorderRadius.all(Radius.circular(20))),
-                        width: MediaQuery.of(context).size.width,
-                        child: TextField(
-                          style: const TextStyle(color: AppTheme.fontColor),
-                          controller: ageController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 3),
-                              isDense: true,
-                              hintText: 'Enter your age',
-                              border: InputBorder.none),
-                        )),
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: DropdownButton<String>(
+                            alignment: Alignment.center,
+                            isExpanded: true,
+                            hint: const Text("Enter your age"),
+                            dropdownColor: Colors.white,
+                            underline: SizedBox(),
+                            icon: const Icon(Icons.arrow_drop_down),
+                            items: ageList.map(buildMenuItem).toList(),
+                            value: ageValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                ageValue = newValue;
+                              });
+                            })),
                     const Padding(
                       padding: EdgeInsets.only(bottom: 13, top: 13, left: 16),
                       child: Text(
@@ -382,7 +391,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       User user = User(
                           email: emailController.text,
                           userName: userNameController.text,
-                          age: int.parse(ageController.text),
+                          age: ageValue,
                           securityQuestionAnswer:
                               securityQuestionAnswerController.text,
                           securityQuestion: securityQuestionController.text,
@@ -442,7 +451,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _checkNull() {
     return emailController.text.trim().isEmpty ||
         userNameController.text.isEmpty ||
-        ageController.text.isEmpty ||
+        ageValue == null ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty ||
         securityQuestionController.text.isEmpty ||
@@ -459,4 +468,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         textColor: Colors.white,
         fontSize: 16.0);
   }
+}
+
+List<String> _createAgeList() {
+  List<String> list = [];
+
+  for (var i = 18; i < 99; i++) {
+    list.add(i.toString());
+  }
+  return list;
 }

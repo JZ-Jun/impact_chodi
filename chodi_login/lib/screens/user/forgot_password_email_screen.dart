@@ -6,8 +6,6 @@ import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:flutter_chodi_app/widget/strip_guide_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../../services/sqlite_service.dart';
-
 class ForgotPasswordEmailScreen extends StatefulWidget {
   const ForgotPasswordEmailScreen({Key? key}) : super(key: key);
 
@@ -17,7 +15,6 @@ class ForgotPasswordEmailScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
-  //SqliteService sqliteService = SqliteService.instance;
   FirebaseService fbservice = FirebaseService();
   late TextEditingController emailController;
   late User user;

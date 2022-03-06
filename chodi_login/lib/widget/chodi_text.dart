@@ -51,7 +51,7 @@ class ChodiText extends StatelessWidget {
         const Padding(
             padding: EdgeInsets.only(top: 25),
             child: Text(
-              "Create Hope & Oppotunity",
+              "Create Hope & Opportunity",
               style: TextStyle(
                   fontSize: 14,
                   color: AppTheme.fontColor,
@@ -60,7 +60,7 @@ class ChodiText extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.only(top: 6),
           child: Text(
-            "By Direct imdact",
+            "By Direct Impact",
             style: TextStyle(
                 fontSize: 14,
                 color: AppTheme.fontColor,
