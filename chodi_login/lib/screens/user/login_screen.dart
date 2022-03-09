@@ -4,12 +4,12 @@ import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/screens/home_screen.dart';
 import 'package:flutter_chodi_app/screens/user/forgot_password_email_screen.dart';
 import 'package:flutter_chodi_app/screens/user/sign_up_screen.dart';
+import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:flutter_chodi_app/services/google_authentication_service/google_authentication.dart';
-import 'package:flutter_chodi_app/services/shared_preferences_service.dart';
-import 'package:flutter_chodi_app/services/sqlite_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widget/chodi_text.dart';
 
@@ -21,9 +21,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  SqliteService service = SqliteService.instance;
   bool _rememberMe = false;
-  late TextEditingController userNameController;
+  late TextEditingController emailController;
   late TextEditingController passwordController;
 
   bool _watchPassword = true;
@@ -31,8 +30,13 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    userNameController = TextEditingController();
+    emailController = TextEditingController();
     passwordController = TextEditingController();
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      emailController.text = (await _getSavedDetail('Email'))!;
+      passwordController.text = (await _getSavedDetail('Password'))!;
+    });
   }
 
   @override
@@ -90,10 +94,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: MediaQuery.of(context).size.width,
                         child: TextField(
                           style: const TextStyle(color: AppTheme.fontColor),
-                          controller: userNameController,
+                          controller: emailController,
                           decoration: const InputDecoration(
                               contentPadding: EdgeInsets.only(left: 3),
-                              hintText: 'Email/Username',
+                              hintText: 'Email',
                               isDense: true,
                               border: InputBorder.none),
                         ),
@@ -240,33 +244,26 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(fontSize: 20, color: Colors.white),
                           ),
                         ),
-                        onTap: () {
-                          service
-                              .getUser(userNameController.text.toString(),
-                                  userNameController.text.toString())
-                              .then((value) => {
-                                    if (value.id == null ||
-                                        passwordController.text !=
-                                            value.password)
-                                      _showToast('wrong account or password')
-                                    else if (passwordController.text.isEmpty ||
-                                        userNameController.text.isEmpty)
-                                      _showToast('cannot be empty')
-                                    else
-                                      {
-                                        if (_rememberMe)
-                                          {
-                                            SharedPreferencesService.instance
-                                                .setUserId(value.id as int)
-                                          },
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const HomeSrceen()),
-                                            (route) => false)
-                                      }
-                                  });
+                        onTap: () async {
+                          final provider = Provider.of<FirebaseService>(context,
+                              listen: false);
+
+                          provider.userSignIn(
+                              emailController.text, passwordController.text);
+
+                          if (_rememberMe) {
+                            SharedPreferences preferences =
+                                await SharedPreferences.getInstance();
+                            await preferences.clear();
+                            preferences.setString(
+                                'Email', emailController.text);
+                            preferences.setString(
+                                'Password', passwordController.text);
+                          } else {
+                            SharedPreferences preferences =
+                                await SharedPreferences.getInstance();
+                            preferences.clear();
+                          }
                         },
                       ),
                       Expanded(
@@ -340,5 +337,14 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: const Color(0xFF76D6E1),
         textColor: Colors.white,
         fontSize: 16.0);
+  }
+
+  Future<String?> _getSavedDetail(String detail) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final savedString = preferences.getString(detail);
+    if (savedString == null) {
+      return "";
+    }
+    return savedString;
   }
 }

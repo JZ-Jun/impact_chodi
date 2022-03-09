@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/models/user.dart';
 import 'package:flutter_chodi_app/screens/user/forgot_password_security_question_screen.dart';
+import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:flutter_chodi_app/widget/strip_guide_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import '../../services/sqlite_service.dart';
 
 class ForgotPasswordEmailScreen extends StatefulWidget {
   const ForgotPasswordEmailScreen({Key? key}) : super(key: key);
@@ -16,7 +15,7 @@ class ForgotPasswordEmailScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
-  SqliteService sqliteService = SqliteService.instance;
+  FirebaseService fbservice = FirebaseService();
   late TextEditingController emailController;
   late User user;
 
@@ -129,22 +128,18 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
                 ),
-                onTap: () {
-                  sqliteService
-                      .getUser(emailController.text.toString(),
-                          emailController.text.toString())
-                      .then((value) => {
-                            if (value.id == null)
-                              _showToast("account does not exist")
-                            else
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ForgotSecurityQuestionScreen(),
-                                    settings: RouteSettings(arguments: value)),
-                              )
-                          });
+                onTap: () async {
+                  if (_validateEmail() &&
+                      await fbservice
+                          .checkIfEmailExistsInFirebase(emailController.text)) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ForgotSecurityQuestionScreen(
+                                email: emailController.text)));
+                  } else {
+                    _showToast("Invalid email");
+                  }
                 },
               ),
             ))
@@ -152,6 +147,14 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
         ),
       ),
     );
+  }
+
+  //should be fixed later. Emails such as uciID@gmail.edy or uciID@gmail.e get accepted.
+  bool _validateEmail() {
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(emailController.text);
   }
 
   _showToast(String msg) {

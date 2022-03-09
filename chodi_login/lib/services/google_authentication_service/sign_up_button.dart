@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import 'google_authentication.dart';
-import 'dart:developer'; //for printing
 
 /*Text Link for signing up for Chodi*/
 
@@ -47,7 +46,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           context,
                           listen: false);
                       provider.googleLogin(); //enable login
-                      log('Click!');
                     }),
             ],
           ),

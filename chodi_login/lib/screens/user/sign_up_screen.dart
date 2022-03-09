@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/models/user.dart';
-import 'package:flutter_chodi_app/services/sqlite_service.dart';
+import 'package:flutter_chodi_app/services/firebase_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import 'login_screen.dart';
 
@@ -14,8 +15,11 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  String? ageValue;
+  List<String> ageList = _createAgeList();
+
   bool _checkboxValue = false;
-  late TextEditingController ageController;
+
   late TextEditingController emailController;
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
@@ -23,7 +27,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late TextEditingController securityQuestionController;
   late TextEditingController securityQuestionAnswerController;
 
-  SqliteService service = SqliteService.instance;
+  FirebaseService fbservice = FirebaseService();
 
   @override
   void initState() {
@@ -32,10 +36,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
     userNameController = TextEditingController();
-    ageController = TextEditingController();
     securityQuestionController = TextEditingController();
     securityQuestionAnswerController = TextEditingController();
   }
+
+  DropdownMenuItem<String> buildMenuItem(String ageValue) => DropdownMenuItem(
+      value: ageValue,
+      child: Text(ageValue, style: const TextStyle(color: AppTheme.fontColor)));
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           decoration: const InputDecoration(
                               contentPadding: EdgeInsets.only(left: 3),
                               isDense: true,
-                              hintText: 'Enter your user name',
+                              hintText: 'Enter your username',
                               border: InputBorder.none),
                         )),
                     const Padding(
@@ -154,24 +161,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.only(left: 16),
+                        padding: const EdgeInsets.only(left: 16, right: 16),
                         height: 38,
                         decoration: const BoxDecoration(
                             color: AppTheme.editTextColors,
                             borderRadius:
                                 BorderRadius.all(Radius.circular(20))),
-                        width: MediaQuery.of(context).size.width,
-                        child: TextField(
-                          style: const TextStyle(color: AppTheme.fontColor),
-                          controller: ageController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 3),
-                              isDense: true,
-                              hintText: 'Enter your age',
-                              border: InputBorder.none),
-                        )),
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: DropdownButton<String>(
+                            alignment: Alignment.center,
+                            isExpanded: true,
+                            hint: const Text("Enter your age"),
+                            dropdownColor: Colors.white,
+                            underline: SizedBox(),
+                            icon: const Icon(Icons.arrow_drop_down),
+                            items: ageList.map(buildMenuItem).toList(),
+                            value: ageValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                ageValue = newValue;
+                              });
+                            })),
                     const Padding(
                       padding: EdgeInsets.only(bottom: 13, top: 13, left: 16),
                       child: Text(
@@ -373,33 +383,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       _showToast("email error");
                     } else if (!_checkPassword()) {
                       _showToast("password error");
+                    } else if (passwordController.text.length < 6) {
+                      _showToast("password must be min 6 character long");
                     } else if (!_checkboxValue) {
                       _showToast("Please agree to the terms and privacy");
                     } else {
-                      service
-                          .getUser(
-                              emailController.text, userNameController.text)
-                          .then((value) {
-                        if (value.id == null) {
-                          service.insertUser(User(
-                              email: emailController.text,
-                              userName: userNameController.text,
-                              age: int.parse(ageController.text),
-                              password: passwordController.text,
-                              securityQuestionAnswer:
-                                  securityQuestionAnswerController.text,
-                              securityQuestion:
-                                  securityQuestionController.text));
-                          _showToast("success");
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()),
-                              (route) => false);
-                        } else {
-                          _showToast("account already exists");
-                        }
-                      });
+                      User user = User(
+                          email: emailController.text,
+                          userName: userNameController.text,
+                          age: ageValue,
+                          securityQuestionAnswer:
+                              securityQuestionAnswerController.text,
+                          securityQuestion: securityQuestionController.text,
+                          password: passwordController.text);
+
+                      final provider =
+                          Provider.of<FirebaseService>(context, listen: false);
+                      provider.userSignUp(user, context);
                     }
                   },
                 ),
@@ -436,6 +436,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  //should be fixed later. Emails such as uciID@gmail.edy or uciID@gmail.e get accepted.
   bool _validateEmail() {
     String pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -450,7 +451,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _checkNull() {
     return emailController.text.trim().isEmpty ||
         userNameController.text.isEmpty ||
-        ageController.text.isEmpty ||
+        ageValue == null ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty ||
         securityQuestionController.text.isEmpty ||
@@ -467,4 +468,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         textColor: Colors.white,
         fontSize: 16.0);
   }
+}
+
+List<String> _createAgeList() {
+  List<String> list = [];
+
+  for (var i = 18; i < 99; i++) {
+    list.add(i.toString());
+  }
+  return list;
 }
