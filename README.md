@@ -1,10 +1,11 @@
+A new Flutter project.
+
 # chodi_login module.
 # chodi_impact module.
 # Code: Jun Zhu, Yuxi Ge, Yilin Li, Database: James,Ashley
 
-# impact_chodi
 
-A new Flutter project.
+
 
 ## Getting Started
 
