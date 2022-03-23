@@ -1,5 +1,6 @@
-# chodi_login
-# Code: Jun Zhu, Yuxi Ge, Yilin Li, Database: James, Google login: Ashley
+# chodi_login module.
+# chodi_impact module.
+# Code: Jun Zhu, Yuxi Ge, Yilin Li, Database: James,Ashley
 
 # impact_chodi
 
