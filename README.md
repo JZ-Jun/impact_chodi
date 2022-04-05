@@ -2,6 +2,7 @@ A new Flutter project.
 
 # chodi_login module.
 # chodi_impact module.
+# chodi_for you module.
 # Code: Jun Zhu, Yuxi Ge, Yilin Li, Database: James,Ashley
 
 
