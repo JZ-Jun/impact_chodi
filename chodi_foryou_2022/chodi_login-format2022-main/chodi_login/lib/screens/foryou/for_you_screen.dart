@@ -35,160 +35,179 @@ class _ForYouScreenState extends State<ForYouScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('C', style: TextStyle(fontSize: 25, color: Colors.yellow)),
-              Text('H', style: TextStyle(fontSize: 25, color: Colors.orange)),
-              Text('O', style: TextStyle(fontSize: 25, color: Colors.red)),
-              Text('D', style: TextStyle(fontSize: 25, color: Colors.blue)),
-              Text('I', style: TextStyle(fontSize: 25, color: Colors.green))
-            ],
-          ),
-          centerTitle: true,
-          backgroundColor: Colors.grey.shade400,
-          actions: [
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return search_page();
-                  }));
-                },
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  child: Icon(Icons.search),
-                ))
-          ],
-        ),
-        body: Container(
-          padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-          child: SingleChildScrollView(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Featured',
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.transparent,
-                child: SizedBox.fromSize(
-                  size: Size.fromHeight(170),
-                  child: new Swiper(
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        padding: EdgeInsets.only(bottom: 15),
-                        child: Image.asset(
-                          bannerList[index],
-                          fit: BoxFit.contain,
-                        ),
-                      );
-                    },
-                    //自定义指示器
-                    pagination: SwiperPagination(
-                        margin: new EdgeInsets.only(bottom: 0),
-                        builder: CustomRectSwiperPaginationBuilder(
-                            color: Colors.grey.shade300,
-                            activeColor: Colors.grey,
-                            sizeW: 15,
-                            sizeH: 15,
-                            activeSizeW: 15,
-                            activeSizeH: 15,
-                            space: 5)),
-                    loop: true,
-                    autoplayDelay: 5000,
-                    itemCount: bannerList.length,
-                    control: null,
-                    duration: 1000,
-                    scrollDirection: Axis.horizontal,
-                    viewportFraction: 1,
-                    autoplay: false,
+    return StreamBuilder<dynamic>(
+        stream: null,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Container();
+          } else {
+            return Scaffold(
+                appBar: AppBar(
+                  title: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text('C',
+                          style: TextStyle(fontSize: 25, color: Colors.yellow)),
+                      Text('H',
+                          style: TextStyle(fontSize: 25, color: Colors.orange)),
+                      Text('O',
+                          style: TextStyle(fontSize: 25, color: Colors.red)),
+                      Text('D',
+                          style: TextStyle(fontSize: 25, color: Colors.blue)),
+                      Text('I',
+                          style: TextStyle(fontSize: 25, color: Colors.green))
+                    ],
                   ),
+                  centerTitle: true,
+                  backgroundColor: Colors.grey.shade400,
+                  elevation: 0,
+                  actions: [
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return search_page();
+                          }));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          child: const Icon(Icons.search),
+                        ))
+                  ],
                 ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                height: 1,
-                color: Colors.grey,
-              ),
-              SizedBox(height: 10),
-              Text('Explore Your Community',
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              Text(
-                  'Support and expower nonprofits around your local area. Be the change in your community!'),
-              Container(
-                height: 150,
-                child: ListView.builder(
-                    itemBuilder: (context, index) {
-                      return buildItem(index, communityList[index]);
-                    },
-                    itemCount: communityList.length,
-                    scrollDirection: Axis.horizontal),
-              ),
-              SizedBox(height: 5),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return community_page();
-                    }));
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                body: Container(
+                  padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+                  child: SingleChildScrollView(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('More', style: TextStyle(color: Colors.blue)),
-                      SizedBox(width: 5),
-                      Icon(Icons.chevron_right, color: Colors.blue)
+                      const Text('Featured',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      Container(
+                        color: Colors.transparent,
+                        child: SizedBox.fromSize(
+                          size: Size.fromHeight(170),
+                          child: new Swiper(
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                padding: EdgeInsets.only(bottom: 15),
+                                child: Image.asset(
+                                  bannerList[index],
+                                  fit: BoxFit.contain,
+                                ),
+                              );
+                            },
+                            //自定义指示器
+                            pagination: SwiperPagination(
+                                margin: new EdgeInsets.only(bottom: 0),
+                                builder: CustomRectSwiperPaginationBuilder(
+                                    color: Colors.grey.shade300,
+                                    activeColor: Colors.grey,
+                                    sizeW: 15,
+                                    sizeH: 15,
+                                    activeSizeW: 15,
+                                    activeSizeH: 15,
+                                    space: 5)),
+                            loop: true,
+                            autoplayDelay: 5000,
+                            itemCount: bannerList.length,
+                            control: null,
+                            duration: 1000,
+                            scrollDirection: Axis.horizontal,
+                            viewportFraction: 1,
+                            autoplay: false,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('Explore Your Community',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      Text(
+                          'Support and expower nonprofits around your local area. Be the change in your community!'),
+                      Container(
+                        height: 150,
+                        child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              return buildItem(index, communityList[index]);
+                            },
+                            itemCount: communityList.length,
+                            scrollDirection: Axis.horizontal),
+                      ),
+                      const SizedBox(height: 5),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return community_page();
+                            }));
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text('More',
+                                  style: TextStyle(color: Colors.blue)),
+                              SizedBox(width: 5),
+                              Icon(Icons.chevron_right, color: Colors.blue)
+                            ],
+                          )),
+                      const SizedBox(height: 5),
+                      Container(
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(height: 10),
+                      const Text('Based on your Interests',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
+                      Container(
+                        height: 150,
+                        child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              return buildItem(index, interestList[index]);
+                            },
+                            itemCount: interestList.length,
+                            scrollDirection: Axis.horizontal),
+                      ),
+                      const SizedBox(height: 5),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return interest_page();
+                            }));
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: const [
+                              Text('More',
+                                  style: TextStyle(color: Colors.blue)),
+                              SizedBox(width: 5),
+                              Icon(Icons.chevron_right, color: Colors.blue)
+                            ],
+                          )),
+                      const SizedBox(height: 10),
                     ],
                   )),
-              SizedBox(height: 5),
-              Container(
-                height: 1,
-                color: Colors.grey,
-              ),
-              SizedBox(height: 10),
-              Text('Based on your Interests',
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold)),
-              Container(
-                height: 150,
-                child: ListView.builder(
-                    itemBuilder: (context, index) {
-                      return buildItem(index, interestList[index]);
-                    },
-                    itemCount: interestList.length,
-                    scrollDirection: Axis.horizontal),
-              ),
-              SizedBox(height: 5),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return interest_page();
-                    }));
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text('More', style: TextStyle(color: Colors.blue)),
-                      SizedBox(width: 5),
-                      Icon(Icons.chevron_right, color: Colors.blue)
-                    ],
-                  )),
-              SizedBox(height: 10),
-            ],
-          )),
-        ));
+                ));
+          }
+        });
   }
 
   buildItem(int index, String txt) {

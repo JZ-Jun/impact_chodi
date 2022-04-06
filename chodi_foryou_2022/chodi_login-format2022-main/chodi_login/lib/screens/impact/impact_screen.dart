@@ -183,6 +183,8 @@ class _ImpactScreenState extends State<ImpactScreen>
   late Animation<double> animation;
   late AnimationController controller;
 
+  late final Future allData;
+
   String totalEventsParticipatedIn = '';
 
   @override
@@ -191,6 +193,16 @@ class _ImpactScreenState extends State<ImpactScreen>
     recentHistoryData = _getRecentHistoryDataImpact(10); //START AT 10
     supportedOrganizationsData = _getSupportedOrganizations();
     organizationImageURLs = _getSupportedOrganizations('assetURL');
+
+    allData = Future.wait(
+      [
+        recentHistoryData,
+        supportedOrganizationsData,
+        organizationImageURLs,
+        //_getTotalParticipatedEvents(),
+        //_getOrganizationWidget(context),
+      ],
+    );
 
     controller = AnimationController(
       duration: const Duration(milliseconds: 1300),
@@ -206,15 +218,7 @@ class _ImpactScreenState extends State<ImpactScreen>
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: Future.wait(
-          [
-            recentHistoryData,
-            supportedOrganizationsData,
-            organizationImageURLs,
-            //_getTotalParticipatedEvents(),
-            //_getOrganizationWidget(context),
-          ],
-        ),
+        future: allData,
         builder: ((BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
