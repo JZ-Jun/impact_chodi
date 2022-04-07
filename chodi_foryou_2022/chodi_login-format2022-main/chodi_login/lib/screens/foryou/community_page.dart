@@ -1,9 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chodi_app/models/nonprofit_organization.dart';
 
 import 'detail_page.dart';
 
 class community_page extends StatefulWidget {
+  List<NonProfitOrg> ngoList = [];
+
+  community_page({Key? key, required this.ngoList}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return community_page_state();
@@ -11,18 +16,16 @@ class community_page extends StatefulWidget {
 }
 
 class community_page_state extends State<community_page> {
-  List<String> communityList = [
-    'Save the Children',
-    'unicef',
-    'animal save',
-    'example'
-  ];
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text('Communities'),
+        elevation: 0,
         backgroundColor: Colors.grey.shade400,
       ),
       body: Container(
@@ -40,7 +43,7 @@ class community_page_state extends State<community_page> {
             itemBuilder: (context, index) {
               return buildItem(index);
             },
-            itemCount: communityList.length),
+            itemCount: widget.ngoList.length),
       ),
     );
   }
@@ -49,7 +52,9 @@ class community_page_state extends State<community_page> {
     return GestureDetector(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return detail_page(communityList[index]);
+            return Detail_Page(
+              ngoInfo: widget.ngoList[index],
+            );
           }));
         },
         child: Container(
@@ -70,9 +75,11 @@ class community_page_state extends State<community_page> {
             children: [
               Container(
                 height: 140,
-                child: Image.asset(
-                  'assets/images/for_you.png',
-                  fit: BoxFit.fill,
+                child: CachedNetworkImage(
+                  imageUrl: widget.ngoList[index].imageURL!, //testing image
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               Expanded(
@@ -80,7 +87,7 @@ class community_page_state extends State<community_page> {
                 alignment: Alignment.center,
                 color: Colors.grey.shade200,
                 padding: EdgeInsets.only(left: 5),
-                child: Text('${communityList[index]}',
+                child: Text(widget.ngoList[index].name,
                     style: TextStyle(fontSize: 10)),
               ))
             ],

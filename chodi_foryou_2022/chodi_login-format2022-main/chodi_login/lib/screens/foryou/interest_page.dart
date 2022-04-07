@@ -1,10 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chodi_app/models/nonprofit_organization.dart';
 
 import 'detail_page.dart';
 
 class interest_page extends StatefulWidget {
   @override
+  List<NonProfitOrg> communityNgoList = [];
+
+  interest_page({Key? key, required this.communityNgoList}) : super(key: key);
   State<StatefulWidget> createState() {
     return interest_page_state();
   }
@@ -22,11 +27,12 @@ class interest_page_state extends State<interest_page> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: const Text('Interests'),
         backgroundColor: Colors.grey.shade400,
+        elevation: 0,
       ),
       body: Container(
-        padding: EdgeInsets.all(15),
+        padding: const EdgeInsets.all(15),
         child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 //横轴元素个数
@@ -49,16 +55,16 @@ class interest_page_state extends State<interest_page> {
     return GestureDetector(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return detail_page(communityList[index]);
+            return Detail_Page(ngoInfo: widget.communityNgoList[index]);
           }));
         },
         child: Container(
-          margin: EdgeInsets.only(left: 5, top: 10, right: 5),
+          margin: const EdgeInsets.only(left: 5, top: 10, right: 5),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
               border: Border.all(color: Colors.grey),
               color: Colors.white,
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                     color: Colors.grey,
                     offset: Offset(0.0, 2.0),
@@ -70,18 +76,21 @@ class interest_page_state extends State<interest_page> {
             children: [
               Container(
                 height: 140,
-                child: Image.asset(
-                  'assets/images/for_you.png',
-                  fit: BoxFit.fill,
+                child: CachedNetworkImage(
+                  imageUrl:
+                      widget.communityNgoList[index].imageURL!, //testing image
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               Expanded(
                   child: Container(
                 alignment: Alignment.center,
                 color: Colors.grey.shade200,
-                padding: EdgeInsets.only(left: 5),
-                child: Text('${communityList[index]}',
-                    style: TextStyle(fontSize: 10)),
+                padding: const EdgeInsets.only(left: 5),
+                child: Text(communityList[index],
+                    style: const TextStyle(fontSize: 10)),
               ))
             ],
           ),

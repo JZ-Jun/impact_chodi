@@ -1,11 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/screens/foryou/search_page.dart';
 import 'package:flutter_chodi_app/widget/SwiperPagination.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../models/nonprofit_organization.dart';
 
 import 'community_page.dart';
 import 'detail_page.dart';
 import 'interest_page.dart';
+
+import 'dart:developer';
 
 class ForYouScreen extends StatefulWidget {
   const ForYouScreen({Key? key}) : super(key: key);
@@ -15,34 +20,64 @@ class ForYouScreen extends StatefulWidget {
 }
 
 class _ForYouScreenState extends State<ForYouScreen> {
-  List<String> bannerList = [
-    'assets/images/for_you.png',
-    'assets/images/for_you.png',
-    'assets/images/for_you.png'
-  ];
-  List<String> communityList = [
-    'Save the Children',
-    'unicef',
-    'animal save',
-    'example'
-  ];
-  List<String> interestList = [
-    'Doctors without Borders',
-    'Doctors without Borders',
-    'Doctors without Borders',
-    'example'
-  ];
+  late Stream<QuerySnapshot<Map<String, dynamic>>> dataList;
+
+  @override
+  void initState() {
+    dataList = FirebaseFirestore.instance
+        .collection("Nonprofits")
+        .orderBy("Name", descending: false)
+        .snapshots();
+
+    super.initState();
+  }
+
+  //stores data for the nonprofit organization
+  List<NonProfitOrg> ngoList = [];
+
+  //store interest data based on user data?
+  //build recommendations system based on possibly organizations supported
+  //choose organizations with same categories?
+  List<NonProfitOrg> interestList = [];
+
+  List<NonProfitOrg> bannerList = [];
+  _addNgoToFeaturedOrgBanner(List ngoList, [orgName1, orgName2, orgName3]) {
+    for (var i in ngoList) {
+      if (i.name == orgName1) {
+        bannerList.add(i);
+      }
+
+      if (i.name == orgName2) {
+        bannerList.add(i);
+      }
+
+      if (i.name == orgName3) {
+        bannerList.add(i);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<dynamic>(
-        stream: null,
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+    return StreamBuilder(
+        stream: dataList,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Container();
           } else {
+            //get data from nonprofit documents and insert into a list of NonProfitOrg
+            for (var i in snapshot.data!.docs) {
+              ngoList.add(NonProfitOrg.fromFirestore(i));
+            }
+
+            _addNgoToFeaturedOrgBanner(
+                ngoList,
+                "LA FOOD BANK",
+                "Make A Wish Foundation of Greater Bay Area",
+                "The Rescue Animal Santuary Inc.");
+
             return Scaffold(
                 appBar: AppBar(
                   title: Row(
@@ -92,20 +127,33 @@ class _ForYouScreenState extends State<ForYouScreen> {
                       Container(
                         color: Colors.transparent,
                         child: SizedBox.fromSize(
-                          size: Size.fromHeight(170),
-                          child: new Swiper(
+                          size: const Size.fromHeight(170),
+                          child: Swiper(
                             itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                padding: EdgeInsets.only(bottom: 15),
-                                child: Image.asset(
-                                  bannerList[index],
-                                  fit: BoxFit.contain,
+                              return GestureDetector(
+                                child: Container(
+                                  padding: const EdgeInsets.only(bottom: 15),
+                                  child: CachedNetworkImage(
+                                    imageUrl: bannerList[index]
+                                        .imageURL!, //testing image
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
                                 ),
+                                onTap: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return Detail_Page(
+                                        ngoInfo: bannerList[index]);
+                                  }));
+                                },
                               );
                             },
                             //自定义指示器
                             pagination: SwiperPagination(
-                                margin: new EdgeInsets.only(bottom: 0),
+                                margin: const EdgeInsets.only(bottom: 0),
                                 builder: CustomRectSwiperPaginationBuilder(
                                     color: Colors.grey.shade300,
                                     activeColor: Colors.grey,
@@ -115,17 +163,17 @@ class _ForYouScreenState extends State<ForYouScreen> {
                                     activeSizeH: 15,
                                     space: 5)),
                             loop: true,
-                            autoplayDelay: 5000,
+                            autoplayDelay: 4000,
                             itemCount: bannerList.length,
                             control: null,
-                            duration: 1000,
+                            duration: 2000,
                             scrollDirection: Axis.horizontal,
                             viewportFraction: 1,
-                            autoplay: false,
+                            autoplay: true,
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
                         height: 1,
                         color: Colors.grey,
@@ -137,15 +185,15 @@ class _ForYouScreenState extends State<ForYouScreen> {
                               color: Colors.black,
                               fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
-                      Text(
-                          'Support and expower nonprofits around your local area. Be the change in your community!'),
+                      const Text(
+                          'Support and empower nonprofits around your local area. Be the change in your community!'),
                       Container(
                         height: 150,
                         child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return buildItem(index, communityList[index]);
+                              return buildItem(index, ngoList[index]);
                             },
-                            itemCount: communityList.length,
+                            itemCount: ngoList.length,
                             scrollDirection: Axis.horizontal),
                       ),
                       const SizedBox(height: 5),
@@ -153,12 +201,14 @@ class _ForYouScreenState extends State<ForYouScreen> {
                           onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return community_page();
+                              return community_page(
+                                ngoList: ngoList,
+                              );
                             }));
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
+                            children: const [
                               Text('More',
                                   style: TextStyle(color: Colors.blue)),
                               SizedBox(width: 5),
@@ -170,8 +220,8 @@ class _ForYouScreenState extends State<ForYouScreen> {
                         height: 1,
                         color: Colors.grey,
                       ),
-                      SizedBox(height: 10),
-                      const Text('Based on your Interests',
+                      const SizedBox(height: 10),
+                      const Text('Based on your interests',
                           style: TextStyle(
                               fontSize: 20,
                               color: Colors.black,
@@ -180,9 +230,9 @@ class _ForYouScreenState extends State<ForYouScreen> {
                         height: 150,
                         child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return buildItem(index, interestList[index]);
+                              return buildItem(index, ngoList[index]);
                             },
-                            itemCount: interestList.length,
+                            itemCount: ngoList.length,
                             scrollDirection: Axis.horizontal),
                       ),
                       const SizedBox(height: 5),
@@ -190,7 +240,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                           onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return interest_page();
+                              return interest_page(communityNgoList: ngoList);
                             }));
                           },
                           child: Row(
@@ -210,20 +260,20 @@ class _ForYouScreenState extends State<ForYouScreen> {
         });
   }
 
-  buildItem(int index, String txt) {
+  buildItem(int index, NonProfitOrg ngo) {
     return GestureDetector(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return detail_page(txt);
+            return Detail_Page(ngoInfo: ngoList[index]);
           }));
         },
         child: Container(
-          margin: EdgeInsets.only(left: 5, top: 10, right: 5),
+          margin: const EdgeInsets.only(left: 5, top: 10, right: 5),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
               border: Border.all(color: Colors.grey),
               color: Colors.white,
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                     color: Colors.grey,
                     offset: Offset(0.0, 2.0),
@@ -236,9 +286,11 @@ class _ForYouScreenState extends State<ForYouScreen> {
               Container(
                 width: 120,
                 height: 110,
-                child: Image.asset(
-                  'assets/images/for_you.png',
-                  fit: BoxFit.fill,
+                child: CachedNetworkImage(
+                  imageUrl: ngo.imageURL!, //testing image
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               Expanded(
@@ -246,8 +298,8 @@ class _ForYouScreenState extends State<ForYouScreen> {
                 width: 120,
                 alignment: Alignment.centerLeft,
                 color: Colors.grey.shade200,
-                padding: EdgeInsets.only(left: 5),
-                child: Text('$txt', style: TextStyle(fontSize: 10)),
+                padding: const EdgeInsets.only(left: 5),
+                child: Text(ngo.name, style: const TextStyle(fontSize: 10)),
               ))
             ],
           ),

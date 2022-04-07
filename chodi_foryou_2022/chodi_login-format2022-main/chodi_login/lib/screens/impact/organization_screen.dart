@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chodi_app/models/firebase_data.dart';
 import 'package:flutter_chodi_app/screens/impact/impact_screen.dart';
 import 'package:flutter_chodi_app/services/firebase_authentication_service.dart';
 import 'package:flutter_chodi_app/services/firebase_storage_service.dart';
