@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +38,14 @@ class FirebaseService extends ChangeNotifier {
                       "Age": age,
                       "SecurityQuestion": securityQuestion,
                       "SecurityQuestionAnswer": securityQuestionAnswer,
-                    })
+                    }).then((res) async => {
+                              await FirebaseFirestore.instance
+                                  .collection('Favorites')
+                                  .doc(credential.user!.uid)
+                                  .set({
+                                "Favorite Organizations": [],
+                              })
+                            })
                   }
               });
 
@@ -212,16 +221,6 @@ class FirebaseService extends ChangeNotifier {
   //BELOW ARE METHODS FOR TESTING PURPOSES
   static const exampleID = 'aoeh5HZzZqcqhLn2iugc';
 
-  Future<void> getDataGivenDocumentID() async {
-    DocumentSnapshot<Map<String, dynamic>> personalInfo =
-        await FirebaseFirestore.instance
-            .collection('EndUsers')
-            .doc(exampleID)
-            .get();
-
-    print(personalInfo);
-  }
-
   Future<List<dynamic>> getUserRecentHistoryData() async {
     List<dynamic> allData = [];
 
@@ -253,5 +252,34 @@ class FirebaseService extends ChangeNotifier {
     }
 
     return allData;
+  }
+
+  Future addUserFavoriteOrganizationData(var ein) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites =
+          FirebaseFirestore.instance.collection('Favorites');
+
+      //assume Favorites doc is already created
+      await favorites.doc(user.uid).update({
+        "Favorite Organizations": FieldValue.arrayUnion([ein]),
+        //add to Favorited Organizations array
+      });
+    }
+  }
+
+  Future removeUserFavoriteOrganizationData(var ein) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites =
+          FirebaseFirestore.instance.collection('Favorites');
+
+      //assume Favorites doc is already created
+      await favorites.doc(user.uid).update({
+        "Favorite Organizations": FieldValue.arrayRemove([ein]),
+      });
+    }
   }
 }
