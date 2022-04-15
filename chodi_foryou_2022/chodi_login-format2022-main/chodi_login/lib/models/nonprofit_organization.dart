@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
 class NonProfitOrg {
-  String ein;
-  String name;
-  String category;
+  String? ein;
+  String? name;
+  String? category;
   String? cause;
   String? city;
   String? state;
@@ -25,9 +22,9 @@ class NonProfitOrg {
   //may add more
 
   NonProfitOrg(
-      {required this.ein,
-      required this.name,
-      required this.category,
+      {this.ein,
+      this.name,
+      this.category,
       this.cause,
       this.city,
       this.state,
@@ -48,9 +45,9 @@ class NonProfitOrg {
     Map data = fbData.data() as Map;
 
     return NonProfitOrg(
-      ein: data['EIN'],
-      name: data['Name'],
-      category: data['Category'],
+      ein: data['EIN'] ?? '',
+      name: data['Name'] ?? '',
+      category: data['Category'] ?? '',
       cause: data['Cause'] ?? '',
       city: data['City'] ?? '',
       state: data['State'] ?? '',
@@ -67,5 +64,33 @@ class NonProfitOrg {
       zip: data['Zip'] ?? 0,
       orgSize: data['Org Size'] ?? 0,
     );
+  }
+
+  //use with Firebase search page (search for nonprofits)
+  List<NonProfitOrg> dataListFromSnapshot(QuerySnapshot querySnapshot) {
+    return querySnapshot.docs.map((snapshot) {
+      final Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      return NonProfitOrg(
+        ein: data['EIN'],
+        name: data['Name'],
+        category: data['Category'],
+        cause: data['Cause'] ?? '',
+        city: data['City'] ?? '',
+        state: data['State'] ?? '',
+        website: data['Website'] ?? '',
+        financials: data['Financials'] ?? '',
+        address: data['Address'] ?? '',
+        contactEmail: data['Contact Email'] ?? '',
+        contactFirstName: data['Contact First Name'] ?? '',
+        contactLastName: data['Contact Last Name'] ?? '',
+        contactNumber: data['Contact Number'] ?? '',
+        vision: data['Mission/Vision'] ?? '',
+        imageURL: data['imageURL'] ?? '',
+        founded: data['Founded'] ?? 0,
+        zip: data['Zip'] ?? 0,
+        orgSize: data['Org Size'] ?? 0,
+      );
+    }).toList();
   }
 }

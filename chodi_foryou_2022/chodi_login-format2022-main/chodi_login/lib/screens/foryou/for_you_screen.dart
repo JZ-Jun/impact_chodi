@@ -24,12 +24,11 @@ class _ForYouScreenState extends State<ForYouScreen> {
 
   @override
   void initState() {
+    super.initState();
     dataList = FirebaseFirestore.instance
         .collection("Nonprofits")
         .orderBy("Name", descending: false)
         .snapshots();
-
-    super.initState();
   }
 
   //stores data for the nonprofit organization
@@ -68,6 +67,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
             return Container();
           } else {
             //get data from nonprofit documents and insert into a list of NonProfitOrg
+
             for (var i in snapshot.data!.docs) {
               ngoList.add(NonProfitOrg.fromFirestore(i));
             }
@@ -103,7 +103,9 @@ class _ForYouScreenState extends State<ForYouScreen> {
                         onTap: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
-                            return search_page();
+                            return search_page(
+                              ngoList: ngoList,
+                            );
                           }));
                         },
                         child: Container(
@@ -187,7 +189,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                       const SizedBox(height: 10),
                       const Text(
                           'Support and empower nonprofits around your local area. Be the change in your community!'),
-                      Container(
+                      SizedBox(
                         height: 150,
                         child: ListView.builder(
                             itemBuilder: (context, index) {
@@ -226,7 +228,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                               fontSize: 20,
                               color: Colors.black,
                               fontWeight: FontWeight.bold)),
-                      Container(
+                      SizedBox(
                         height: 150,
                         child: ListView.builder(
                             itemBuilder: (context, index) {
@@ -264,7 +266,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
     return GestureDetector(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return Detail_Page(ngoInfo: ngoList[index]);
+            return Detail_Page(ngoInfo: ngo);
           }));
         },
         child: Container(
@@ -283,7 +285,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              SizedBox(
                 width: 120,
                 height: 110,
                 child: CachedNetworkImage(
@@ -299,7 +301,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                 alignment: Alignment.centerLeft,
                 color: Colors.grey.shade200,
                 padding: const EdgeInsets.only(left: 5),
-                child: Text(ngo.name, style: const TextStyle(fontSize: 10)),
+                child: Text(ngo.name!, style: const TextStyle(fontSize: 10)),
               ))
             ],
           ),

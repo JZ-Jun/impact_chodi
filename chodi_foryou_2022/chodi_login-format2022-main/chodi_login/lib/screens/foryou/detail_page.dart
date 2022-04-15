@@ -67,7 +67,7 @@ class Detail_Page_State extends State<Detail_Page> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(widget.ngoInfo.name,
+                        child: Text(widget.ngoInfo.name!,
                             style: const TextStyle(
                                 fontSize: 20,
                                 color: Colors.black,
@@ -213,13 +213,15 @@ class Detail_Page_State extends State<Detail_Page> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        descTextShowFlag
-                            ? const Text(
-                                "Show Less",
-                                style: TextStyle(color: Colors.blue),
-                              )
-                            : const Text("Show More",
-                                style: TextStyle(color: Colors.blue))
+                        widget.ngoInfo.vision != ''
+                            ? descTextShowFlag
+                                ? const Text(
+                                    "Show Less",
+                                    style: TextStyle(color: Colors.blue),
+                                  )
+                                : const Text("Show More",
+                                    style: TextStyle(color: Colors.blue))
+                            : const SizedBox(height: 0),
                       ],
                     ),
                   ),
