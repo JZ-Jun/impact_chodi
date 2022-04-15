@@ -193,7 +193,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                         height: 150,
                         child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return buildItem(index, ngoList[index]);
+                              return buildItem(ngoList[index]);
                             },
                             itemCount: ngoList.length,
                             scrollDirection: Axis.horizontal),
@@ -232,7 +232,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                         height: 150,
                         child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return buildItem(index, ngoList[index]);
+                              return buildItem(ngoList[index]);
                             },
                             itemCount: ngoList.length,
                             scrollDirection: Axis.horizontal),
@@ -262,7 +262,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
         });
   }
 
-  buildItem(int index, NonProfitOrg ngo) {
+  buildItem(NonProfitOrg ngo) {
     return GestureDetector(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
