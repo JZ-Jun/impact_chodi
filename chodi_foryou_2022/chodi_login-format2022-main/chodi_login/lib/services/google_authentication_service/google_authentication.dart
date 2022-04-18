@@ -90,6 +90,9 @@ class GoogleAuthentication extends ChangeNotifier {
       CollectionReference chodiUsers =
           FirebaseFirestore.instance.collection('EndUsers');
 
+      CollectionReference favorites =
+          FirebaseFirestore.instance.collection('Favorites');
+
       Map<String, dynamic>? idMap = getGivenAndFamilyName(idToken!);
 
       //this method should work!
@@ -109,6 +112,10 @@ class GoogleAuthentication extends ChangeNotifier {
 
         //after logging, redirect to another page, (use if condition to decide) then update the values.
         //Delete account if incompleted.
+      });
+
+      await favorites.doc(user.uid).set({
+        "Favorite Organizations": [],
       });
     }
   }
