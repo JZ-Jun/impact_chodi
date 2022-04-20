@@ -169,7 +169,8 @@ class Detail_Page_State extends State<Detail_Page> {
                           onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return contact_page();
+                              return contact_page(
+                                  contactEmail: widget.ngoInfo.contactEmail!);
                             }));
                           },
                           child: Container(
