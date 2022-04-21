@@ -24,7 +24,6 @@ Future<String> getFutureName() async {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  late Widget _nowWidget;
 
   @override
   Widget build(BuildContext context) {

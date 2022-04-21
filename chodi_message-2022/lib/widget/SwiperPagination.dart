@@ -33,13 +33,13 @@ class CustomRectSwiperPaginationBuilder extends SwiperPlugin {
       {this.activeColor,
       this.color,
       this.key,
-      this.sizeW: 30,
-      this.sizeH: 8,
-      this.activeSizeW: 30,
-      this.activeSizeH: 8,
+      this.sizeW = 30,
+      this.sizeH = 8,
+      this.activeSizeW = 30,
+      this.activeSizeH = 8,
       // this.size: const Size(10.0, 2.0),
       // this.activeSize: const Size(10.0, 2.0),
-      this.space: 3.0});
+      this.space = 3.0});
 
   @override
   Widget build(BuildContext context, SwiperPluginConfig config) {
@@ -72,13 +72,13 @@ class CustomRectSwiperPaginationBuilder extends SwiperPlugin {
     }
 
     if (config.scrollDirection == Axis.vertical) {
-      return new Column(
+      return Column(
         key: key,
         mainAxisSize: MainAxisSize.min,
         children: list,
       );
     } else {
-      return new Row(
+      return Row(
         key: key,
         mainAxisSize: MainAxisSize.min,
         children: list,

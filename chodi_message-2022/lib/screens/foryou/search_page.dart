@@ -94,7 +94,7 @@ class search_page_state extends State<search_page> {
                                                   _showToast('Can\'t be empty');
                                                 } else {
                                                   for (var i in ngoList) {
-                                                    if (i.name!
+                                                    if (i.name
                                                         .toLowerCase()
                                                         .contains(
                                                             _searchController
@@ -174,7 +174,7 @@ class search_page_state extends State<search_page> {
                 alignment: Alignment.center,
                 color: Colors.grey.shade200,
                 padding: const EdgeInsets.only(left: 5),
-                child: Text(searchList[index].name!,
+                child: Text(searchList[index].name,
                     style: const TextStyle(fontSize: 10)),
               ))
             ],

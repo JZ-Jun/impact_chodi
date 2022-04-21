@@ -39,6 +39,7 @@ class RecentActivityWidget extends StatelessWidget {
                       const TextStyle(fontSize: 12, color: Color(0xFFFDB45C))),
               Text(activity.date!,
                   style:
+                      // ignore: use_full_hex_values_for_flutter_colors
                       const TextStyle(fontSize: 12, color: Color(0xfff1eb893)))
             ],
           ),

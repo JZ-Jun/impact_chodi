@@ -44,7 +44,7 @@ class AnalogClock extends StatefulWidget {
       this.decoration = const BoxDecoration(),
       isLive,
       Key? key})
-      : this.isLive = isLive ?? (datetime == null),
+      : isLive = isLive ?? (datetime == null),
         super(key: key);
 
   const AnalogClock.dark(
@@ -87,14 +87,16 @@ class _AnalogClockState extends State<AnalogClock> {
   DateTime datetime;
   Duration updateDuration = const Duration(seconds: 1); // repaint frequency
   _AnalogClockState(datetime)
-      : this.datetime = datetime ?? DateTime.now(),
+      : datetime = datetime ?? DateTime.now(),
         initialDatetime = datetime ?? DateTime.now();
 
+  @override
   initState() {
     super.initState();
     // don't repaint the clock every second if second hand is not shown
-    updateDuration =
-        widget.showSecondHand ? Duration(seconds: 1) : Duration(minutes: 1);
+    updateDuration = widget.showSecondHand
+        ? const Duration(seconds: 1)
+        : const Duration(minutes: 1);
 
     if (widget.isLive) {
       // update clock every second or minute based on second hand's visibility.
@@ -105,7 +107,7 @@ class _AnalogClockState extends State<AnalogClock> {
   update(Timer timer) {
     if (mounted) {
       // update is only called on live clocks. So, it's safe to update datetime.
-      this.datetime = this.initialDatetime.add(updateDuration * timer.tick);
+      datetime = initialDatetime.add(updateDuration * timer.tick);
       setState(() {});
     }
   }
@@ -119,11 +121,11 @@ class _AnalogClockState extends State<AnalogClock> {
       child: Center(
           child: AspectRatio(
               aspectRatio: 1.0,
-              child: new Container(
+              child: Container(
                   constraints: BoxConstraints(minWidth: 48.0, minHeight: 48.0),
                   width: double.infinity,
-                  child: new CustomPaint(
-                    painter: new AnalogClockPainter(
+                  child: CustomPaint(
+                    painter: AnalogClockPainter(
                         datetime: datetime,
                         showDigitalClock: widget.showDigitalClock,
                         showTicks: widget.showTicks,

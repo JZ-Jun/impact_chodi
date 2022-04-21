@@ -383,7 +383,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                 alignment: Alignment.centerLeft,
                 color: Colors.grey.shade200,
                 padding: const EdgeInsets.only(left: 5),
-                child: Text(ngo.name!, style: const TextStyle(fontSize: 10)),
+                child: Text(ngo.name, style: const TextStyle(fontSize: 10)),
               ))
             ],
           ),

@@ -52,6 +52,7 @@ dependencies:
 
   geocoding: ^2.0.4
   geolocator: ^8.2.0
+  google_static_maps_controller: ^1.0.0
   permission_handler: ^9.2.0
 
   rxdart: ^0.27.3
@@ -59,7 +60,8 @@ dependencies:
   firebase_analytics_web: ^0.4.0+10
   flutter_email_sender: ^5.1.0
   
-
+  nanoid: ^1.0.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -96,7 +96,7 @@ class community_page_state extends State<community_page> {
                 alignment: Alignment.center,
                 color: Colors.grey.shade200,
                 padding: const EdgeInsets.only(left: 5),
-                child: Text(widget.ngoList[index].name!,
+                child: Text(widget.ngoList[index].name,
                     style: const TextStyle(fontSize: 10)),
               ))
             ],

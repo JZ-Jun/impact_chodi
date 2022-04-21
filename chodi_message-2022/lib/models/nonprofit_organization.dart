@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NonProfitOrg {
-  String? ein;
-  String? name;
+  String ein;
+  String name;
   String? category;
   String? cause;
   String? city;
@@ -22,8 +22,8 @@ class NonProfitOrg {
   //may add more
 
   NonProfitOrg(
-      {this.ein,
-      this.name,
+      {required this.ein,
+      required this.name,
       this.category,
       this.cause,
       this.city,

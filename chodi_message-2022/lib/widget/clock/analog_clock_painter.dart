@@ -49,8 +49,9 @@ class AnalogClockPainter extends CustomPainter {
       _drawIndicators(canvas, size, scaleFactor, showAllNumbers);
     }
 
-    if (showDigitalClock)
+    if (showDigitalClock) {
       _paintDigitalClock(canvas, size, scaleFactor, useMilitaryTime);
+    }
 
     _paintClockHands(canvas, size, scaleFactor);
     _paintPinHole(canvas, size, scaleFactor);
@@ -89,8 +90,8 @@ class AnalogClockPainter extends CustomPainter {
       double angle = (h * pi / 6) - pi / 2; //+ pi / 2;
       Offset offset =
           Offset(longHandLength * cos(angle), longHandLength * sin(angle));
-      TextSpan span = new TextSpan(style: style, text: h.toString());
-      TextPainter tp = new TextPainter(
+      TextSpan span = TextSpan(style: style, text: h.toString());
+      TextPainter tp = TextPainter(
           text: span,
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr);
@@ -103,7 +104,7 @@ class AnalogClockPainter extends CustomPainter {
     final radians = 2 * pi * percentage;
     final angle = -pi / 2.0 + radians;
 
-    return new Offset(length * cos(angle), length * sin(angle));
+    return Offset(length * cos(angle), length * sin(angle));
   }
 
   // ref: https://www.codenameone.com/blog/codename-one-graphics-part-2-drawing-an-analog-clock.html
@@ -171,12 +172,13 @@ class AnalogClockPainter extends CustomPainter {
         size.center(_getHandOffset(minutes, HAND_PIN_HOLE_SIZE * scaleFactor)),
         size.center(_getHandOffset(minutes, longHandLength)),
         handPaint..color = minuteHandColor);
-    if (showSecondHand)
+    if (showSecondHand) {
       canvas.drawLine(
           size.center(
               _getHandOffset(seconds, HAND_PIN_HOLE_SIZE * scaleFactor)),
           size.center(_getHandOffset(seconds, longHandLength)),
           handPaint..color = secondHandColor);
+    }
   }
 
   void _paintDigitalClock(
@@ -194,12 +196,12 @@ class AnalogClockPainter extends CustomPainter {
     String hour = hourInt.toString().padLeft(2, "0");
     String minute = datetime.minute.toString().padLeft(2, "0");
     String second = datetime.second.toString().padLeft(2, "0");
-    TextSpan digitalClockSpan = new TextSpan(
+    TextSpan digitalClockSpan = TextSpan(
         style: TextStyle(
             color: digitalClockColor,
             fontSize: 18 * scaleFactor * textScaleFactor),
         text: "$hour:$minute:$second$meridiem");
-    TextPainter digitalClockTP = new TextPainter(
+    TextPainter digitalClockTP = TextPainter(
         text: digitalClockSpan,
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr);
