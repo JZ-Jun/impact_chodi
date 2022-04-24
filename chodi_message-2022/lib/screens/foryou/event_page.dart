@@ -2,15 +2,20 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/models/event.dart';
 import 'package:flutter_chodi_app/models/nonprofit_organization.dart';
 import 'package:flutter_chodi_app/screens/foryou/event_detail_page.dart';
+import 'package:flutter_chodi_app/services/firebase_authentication_service.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart';
+
 //For unique event id, use nanoid (10 characters) to generate
+//nanoid(10);
 
 // ignore: camel_case_types
 class event_page extends StatefulWidget {
@@ -30,18 +35,16 @@ _generateUniqueIDs() {
 
 // ignore: camel_case_types
 class event_page_state extends State<event_page> {
-  List<bool> isFavorite = [];
+  final FirebaseService fbservice = FirebaseService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   late Stream dataList;
-  List<int> ngoIntEvents = [1, 2, 3];
+  late Stream favoriteList;
   List<Event> ngoEvents = [];
-
-  bool _isFavorite = false;
 
   int? day;
   int? month;
 
   _clearList() {
-    isFavorite.clear();
     ngoEvents.clear();
   }
 
@@ -67,7 +70,7 @@ class event_page_state extends State<event_page> {
 
     if (days > 1) {
       return "$days \nDays";
-    } else if (day == 1) {
+    } else if (days == 1) {
       return "$days \nDay";
     } else if (days < 1) {
       int hours = diff.inHours;
@@ -103,13 +106,18 @@ class event_page_state extends State<event_page> {
         .where("endTime", isGreaterThanOrEqualTo: DateTime.now())
         .snapshots();
 
+    favoriteList = FirebaseFirestore.instance
+        .collection('Favorites')
+        .doc(_auth.currentUser!.uid)
+        .snapshots();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: dataList,
+        stream: CombineLatestStream.list([dataList, favoriteList]),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -118,10 +126,19 @@ class event_page_state extends State<event_page> {
           } else {
             _clearList();
 
-            for (var i in snapshot.data!.docs) {
+            for (var i in snapshot.data[0]!.docs) {
               ngoEvents.add(Event.fromFirestore(i));
-              isFavorite.add(false);
             }
+
+            /*
+            var testing;
+            try {
+              testing = snapshot.data[1]['Favorite Organins'];
+            } catch (e) {
+              testing = testing == null ? false : true;
+              log(testing.toString());
+            }
+            */
 
             return Scaffold(
               appBar: AppBar(
@@ -167,7 +184,17 @@ class event_page_state extends State<event_page> {
                           )
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
+                      Container(
+                          width: 100,
+                          height: 20,
+                          alignment: Alignment.center,
+                          child: const Text('Event Starts In',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold))),
                       SingleChildScrollView(
                         child: SizedBox(
                           height: 400,
@@ -175,7 +202,8 @@ class event_page_state extends State<event_page> {
                           child: ListView.builder(
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
-                                return buildItem('10', index, ngoEvents[index]);
+                                return buildItem('10', index, ngoEvents[index],
+                                    snapshot.data[1]!);
                               },
                               itemCount: ngoEvents.length,
                               scrollDirection: Axis.vertical),
@@ -191,9 +219,21 @@ class event_page_state extends State<event_page> {
         });
   }
 
-  buildItem(String hour, int index, Event event) {
+  buildItem(String hour, int index, Event event, DocumentSnapshot eventList) {
     int day = _parseDayTimeStamp(event.startTime);
     String month = _parseMonthTimeStamp(event.startTime);
+
+    bool _isFavorite = false;
+
+    //check if user already favorited it
+    try {
+      var _isThere = eventList.get("Favorite Events")[event.eventID];
+      if (_isThere != null) {
+        _isFavorite = true;
+      }
+    } catch (e) {
+      _isFavorite = false;
+    }
 
     _liveTimer(event.startTime);
 
@@ -206,6 +246,7 @@ class event_page_state extends State<event_page> {
                 return event_detail_page(
                   ngoEvent: event,
                   ngoName: widget.ngoInfo.name,
+                  ngoEIN: widget.ngoInfo.ein,
                 );
               }));
             },
@@ -257,10 +298,12 @@ class event_page_state extends State<event_page> {
 
                                   if (_isFavorite) {
                                     //add to firebase
-
+                                    fbservice.addUserFavoriteEvent(
+                                        widget.ngoInfo.ein, event.eventID);
                                   } else {
                                     //remove from firebase
-
+                                    fbservice
+                                        .removeUserFavoriteEvent(event.eventID);
                                   }
                                 });
                               },

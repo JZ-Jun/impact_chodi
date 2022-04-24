@@ -6,14 +6,15 @@ class User {
   String age;
   String securityQuestion;
   String securityQuestionAnswer;
+  Map<dynamic, dynamic> registeredFor;
 
-  User({
-    required this.email,
-    required this.username,
-    required this.age,
-    required this.securityQuestion,
-    required this.securityQuestionAnswer,
-  });
+  User(
+      {required this.email,
+      required this.username,
+      required this.age,
+      required this.securityQuestion,
+      required this.securityQuestionAnswer,
+      required this.registeredFor});
 
   factory User.fromFirestore(QueryDocumentSnapshot fbData) {
     Map data = fbData.data() as Map;
@@ -24,6 +25,7 @@ class User {
       age: data["Age"],
       securityQuestion: data["SecurityQuestion"],
       securityQuestionAnswer: data["SecurityQuestionAnswer"],
+      registeredFor: data["registeredFor"] ?? {},
     );
   }
 }

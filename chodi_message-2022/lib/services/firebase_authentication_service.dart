@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chodi_app/models/activity.dart';
 import 'package:flutter_chodi_app/screens/home_screen.dart';
 import 'package:flutter_chodi_app/screens/user/login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -130,6 +127,7 @@ class FirebaseService extends ChangeNotifier {
           age: '',
           securityQuestion: '',
           securityQuestionAnswer: '',
+          registeredFor: {},
         );
         return chodiUser;
       } else {
@@ -139,6 +137,7 @@ class FirebaseService extends ChangeNotifier {
           age: personalInfo['Age'],
           securityQuestionAnswer: personalInfo["SecurityQuestionAnswer"],
           securityQuestion: personalInfo["SecurityQuestion"],
+          registeredFor: {},
         );
         return chodiUser;
       }
@@ -179,6 +178,7 @@ class FirebaseService extends ChangeNotifier {
                 age: allData[i]['Age'],
                 securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
                 securityQuestion: allData[i]["SecurityQuestion"],
+                registeredFor: {},
               );
               return chodiUser;
             }
@@ -254,6 +254,8 @@ class FirebaseService extends ChangeNotifier {
     return allData;
   }
 
+//Grab data from Firebase
+//Organization
   Future addUserFavoriteOrganizationData(var ein) async {
     final user = _auth.currentUser;
 
@@ -279,6 +281,78 @@ class FirebaseService extends ChangeNotifier {
       //assume Favorites doc is already created
       await favorites.doc(user.uid).update({
         "Favorite Organizations": FieldValue.arrayRemove([ein]),
+      });
+    }
+  }
+
+//Event
+  Future addUserFavoriteEvent(var ein, var eventID) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites =
+          FirebaseFirestore.instance.collection('Favorites');
+
+      //assume Favorites doc is already created
+      await favorites.doc(user.uid).update({
+        'Favorite Events.$eventID': ein,
+      });
+    }
+  }
+
+  Future removeUserFavoriteEvent(var eventID) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites =
+          FirebaseFirestore.instance.collection('Favorites');
+
+      //assume Favorites doc is already created
+      await favorites.doc(user.uid).update({
+        'Favorite Events.$eventID': FieldValue.delete(),
+      });
+    }
+  }
+
+  //Registration for Event
+  Future registerForEvent(var eventID, var ngoEIN, var availableSpace) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference endUsers =
+          FirebaseFirestore.instance.collection('EndUsers');
+
+      CollectionReference nonprofits = FirebaseFirestore.instance
+          .collection("Nonprofits/" + ngoEIN + "/Events");
+
+      await endUsers.doc(user.uid).update({
+        'registeredFor.$eventID': Timestamp.now(),
+      });
+
+      await nonprofits.doc(eventID).update({
+        'Volunteers.${user.uid}': Timestamp.now(),
+        'availableSpace': availableSpace
+      });
+    }
+  }
+
+  Future unregisterForEvent(var eventID, var ngoEIN, var availableSpace) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference endUsers =
+          FirebaseFirestore.instance.collection('EndUsers');
+      CollectionReference nonprofits = FirebaseFirestore.instance
+          .collection("Nonprofits/" + ngoEIN + "/Events");
+
+      //assume Favorites doc is already created
+      await endUsers.doc(user.uid).update({
+        'registeredFor.$eventID': FieldValue.delete(),
+      });
+
+      await nonprofits.doc(eventID).update({
+        'Volunteers.${user.uid}': FieldValue.delete(),
+        'availableSpace': availableSpace
       });
     }
   }
