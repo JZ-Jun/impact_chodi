@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/models/nonprofit_organization.dart';
 
@@ -34,7 +33,7 @@ class interest_page_state extends State<interest_page> {
       body: Container(
         padding: const EdgeInsets.all(15),
         child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 //横轴元素个数
                 crossAxisCount: 2,
                 //纵轴间距

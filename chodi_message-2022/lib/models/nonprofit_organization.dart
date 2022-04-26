@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NonProfitOrg {
-  String? ein;
-  String? name;
+  String ein;
+  String name;
   String? category;
   String? cause;
   String? city;
@@ -22,8 +22,8 @@ class NonProfitOrg {
   //may add more
 
   NonProfitOrg(
-      {this.ein,
-      this.name,
+      {required this.ein,
+      required this.name,
       this.category,
       this.cause,
       this.city,
@@ -64,33 +64,5 @@ class NonProfitOrg {
       zip: data['Zip'] ?? 0,
       orgSize: data['Org Size'] ?? 0,
     );
-  }
-
-  //use with Firebase search page (search for nonprofits)
-  List<NonProfitOrg> dataListFromSnapshot(QuerySnapshot querySnapshot) {
-    return querySnapshot.docs.map((snapshot) {
-      final Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-
-      return NonProfitOrg(
-        ein: data['EIN'],
-        name: data['Name'],
-        category: data['Category'],
-        cause: data['Cause'] ?? '',
-        city: data['City'] ?? '',
-        state: data['State'] ?? '',
-        website: data['Website'] ?? '',
-        financials: data['Financials'] ?? '',
-        address: data['Address'] ?? '',
-        contactEmail: data['Contact Email'] ?? '',
-        contactFirstName: data['Contact First Name'] ?? '',
-        contactLastName: data['Contact Last Name'] ?? '',
-        contactNumber: data['Contact Number'] ?? '',
-        vision: data['Mission/Vision'] ?? '',
-        imageURL: data['imageURL'] ?? '',
-        founded: data['Founded'] ?? 0,
-        zip: data['Zip'] ?? 0,
-        orgSize: data['Org Size'] ?? 0,
-      );
-    }).toList();
   }
 }

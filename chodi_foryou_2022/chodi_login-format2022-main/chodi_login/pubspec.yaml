@@ -47,7 +47,17 @@ dependencies:
   google_sign_in: ^5.2.4
   intl: ^0.17.0
   flutter_swiper_null_safety: ^1.0.2
+
   cached_network_image: ^3.2.0
+
+  geocoding: ^2.0.4
+  geolocator: ^8.2.0
+  permission_handler: ^9.2.0
+
+  rxdart: ^0.27.3
+  firebase_analytics: ^9.1.5
+  firebase_analytics_web: ^0.4.0+10
+  
 
 dev_dependencies:
   flutter_test:

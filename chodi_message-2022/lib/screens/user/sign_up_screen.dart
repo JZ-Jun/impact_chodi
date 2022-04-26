@@ -395,6 +395,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         securityQuestionAnswer:
                             securityQuestionAnswerController.text,
                         securityQuestion: securityQuestionController.text,
+                        registeredFor: {},
                       );
 
                       final provider =
