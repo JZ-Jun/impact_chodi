@@ -7,13 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/models/event.dart';
 import 'package:flutter_chodi_app/widget/share_modal.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 //import 'package:share_plus/share_plus.dart';
-import 'package:flutter_share_me/flutter_share_me.dart';
-import 'package:image_picker/image_picker.dart';
-
 import '../../services/firebase_authentication_service.dart';
 
 // ignore: camel_case_types, must_be_immutable
@@ -48,7 +44,8 @@ class event_detail_page_state extends State<event_detail_page> {
   bool _isFavorite = false;
   bool descTextShowFlag = false;
   bool descTextShowFlag2 = false;
-  late int availableSpace;
+
+  late int totalSpaceTaken;
   late int totalSpace;
 
   String? startDate;
@@ -71,11 +68,9 @@ class event_detail_page_state extends State<event_detail_page> {
         .doc(_auth.currentUser!.uid)
         .snapshots();
 
-    availableSpace = widget.ngoEvent.availableSpace;
+    totalSpace = widget.ngoEvent.totalSpace;
+    totalSpaceTaken = widget.ngoEvent.totalSpaceTaken;
 
-    if (availableSpace > widget.ngoEvent.totalSpace) {
-      availableSpace = widget.ngoEvent.totalSpace;
-    }
     super.initState();
   }
 
@@ -89,6 +84,8 @@ class event_detail_page_state extends State<event_detail_page> {
 
   @override
   Widget build(BuildContext context) {
+    var remainingSpace = totalSpace - totalSpaceTaken;
+    log(remainingSpace.toString());
     return StreamBuilder(
         stream: CombineLatestStream.list([favoriteList, registeredForList]),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
@@ -173,7 +170,7 @@ class event_detail_page_state extends State<event_detail_page> {
                                                     title: const Text(
                                                         'Registration'),
                                                     content: const Text(
-                                                        'You are already registered for the event. Would you like to unregister?'),
+                                                        'You are already registered for the event. Would you like to deregister?'),
                                                     actions: [
                                                       GestureDetector(
                                                         onTap: () =>
@@ -212,31 +209,31 @@ class event_detail_page_state extends State<event_detail_page> {
                                                 }).then((value) {
                                                 if (value == 1) {
                                                   //remove from firebase
-                                                  availableSpace =
-                                                      availableSpace + 1;
-                                                  fbservice.unregisterForEvent(
+
+                                                  totalSpaceTaken--;
+                                                  fbservice.deregisterForEvent(
                                                       widget.ngoEvent.eventID,
                                                       widget.ngoEIN,
-                                                      availableSpace);
+                                                      totalSpaceTaken);
                                                   setState(() {
                                                     _isMark = false;
                                                   });
                                                 }
                                               })
-                                            : availableSpace >
-                                                    0 //User is not registered and space is available
+                                            : remainingSpace >
+                                                    0 //User is not registered to an event yet and space is available
                                                 ? showDialog(
                                                     context: context,
                                                     builder: (context) {
                                                       return AlertDialog(
                                                         title: const Text(
                                                             'Registration'),
-                                                        content: availableSpace >
+                                                        content: remainingSpace >
                                                                 1
                                                             ? Text(
-                                                                'There are ${widget.ngoEvent.availableSpace} spaces available.\nWould you like to register?')
-                                                            : Text(
-                                                                'There is ${widget.ngoEvent.availableSpace} space available.\nWould you like to register?'),
+                                                                'There are $remainingSpace spaces available.\nWould you like to register?')
+                                                            : const Text(
+                                                                'There is 1 space available.\nWould you like to register?'),
                                                         actions: [
                                                           GestureDetector(
                                                             onTap: () =>
@@ -276,14 +273,18 @@ class event_detail_page_state extends State<event_detail_page> {
                                                     }).then((value) {
                                                     if (value == 1) {
                                                       //add to firebase
-                                                      availableSpace =
-                                                          availableSpace - 1;
+                                                      totalSpaceTaken++;
+
                                                       fbservice
                                                           .registerForEvent(
                                                               widget.ngoEvent
+                                                                  .name,
+                                                              widget.ngoEvent
                                                                   .eventID,
                                                               widget.ngoEIN,
-                                                              availableSpace);
+                                                              totalSpaceTaken,
+                                                              widget.ngoEvent
+                                                                  .endTime);
                                                       setState(() {
                                                         _isMark = true;
                                                       });

@@ -6,6 +6,7 @@ class User {
   String age;
   String securityQuestion;
   String securityQuestionAnswer;
+  Timestamp lastUpdated;
   Map<dynamic, dynamic> registeredFor;
 
   User(
@@ -14,6 +15,7 @@ class User {
       required this.age,
       required this.securityQuestion,
       required this.securityQuestionAnswer,
+      required this.lastUpdated,
       required this.registeredFor});
 
   factory User.fromFirestore(QueryDocumentSnapshot fbData) {
@@ -25,6 +27,7 @@ class User {
       age: data["Age"],
       securityQuestion: data["SecurityQuestion"],
       securityQuestionAnswer: data["SecurityQuestionAnswer"],
+      lastUpdated: data['lastUpdated'],
       registeredFor: data["registeredFor"] ?? {},
     );
   }

@@ -102,7 +102,7 @@ class event_page_state extends State<event_page> {
   void initState() {
     dataList = FirebaseFirestore.instance
         .collection("Nonprofits/" + widget.ngoInfo.ein + "/Events")
-        .orderBy("endTime", descending: true)
+        .orderBy("endTime", descending: false)
         .where("endTime", isGreaterThanOrEqualTo: DateTime.now())
         .snapshots();
 

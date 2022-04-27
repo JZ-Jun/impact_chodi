@@ -17,10 +17,13 @@ import 'package:provider/provider.dart';
 import '../../widget/clock/analog_clock.dart';
 
 FirebaseService fbservice = FirebaseService();
+
+/*
 Storage storage = Storage();
 late Future recentHistoryData;
 late Future supportedOrganizationsData;
 late Future organizationImageURLs;
+*/
 
 class ImpactScreen extends StatefulWidget {
   const ImpactScreen({Key? key}) : super(key: key);
@@ -29,8 +32,7 @@ class ImpactScreen extends StatefulWidget {
   State<ImpactScreen> createState() => _ImpactScreenState();
 }
 
-/*RecentAmount imposes a cap on the amount of data that can be read at once (so that we don't
-read all the data*/
+/*
 Future<List<dynamic>> _getRecentHistoryDataImpact(recentAmount,
     [dataField]) async {
   List<dynamic> dataList = []; //contain entire dataset for the collection
@@ -99,15 +101,18 @@ Future<List<dynamic>> _getSupportedOrganizations([dataField]) async {
 
   return listURL;
 }
+*/
 
-//Read data from Firebase Storage to get images
+//navigate to detail_page.dart later
 List<Widget> _createOrganizationWidget(BuildContext context,
     [List<dynamic>? organizationImageURL]) {
   var avatars = <Widget>[];
 
   if (organizationImageURL != null) {
     if (organizationImageURL.isEmpty) {
-      avatars.add(const Text(''));
+      avatars
+          .add(const Text('')); //when list of favorite organizations is empty
+
     } else {
       for (var i = 0; i < organizationImageURL.length; i++) {
         if (i < 4) {
@@ -135,9 +140,11 @@ List<Widget> _createOrganizationWidget(BuildContext context,
   return avatars;
 }
 
+//navigate to event_detail_page
+
 List<Widget> _createRecentActivityWidget(recentAmount,
     [List<dynamic>? recentList, List<dynamic>? recentURLList]) {
-  var list = <Widget>[];
+  var list = <Widget>[]; //contains RecentActivityWidget
   String activityResults = '';
   String date = '';
 
@@ -183,13 +190,17 @@ class _ImpactScreenState extends State<ImpactScreen>
   late Animation<double> animation;
   late AnimationController controller;
 
-  late final Future allData;
+  //late final Future allData;
+
+  late Stream dataList;
 
   String totalEventsParticipatedIn = '';
 
   @override
   void initState() {
     super.initState();
+
+    /*
     recentHistoryData = _getRecentHistoryDataImpact(10); //START AT 10
     supportedOrganizationsData = _getSupportedOrganizations();
     organizationImageURLs = _getSupportedOrganizations('assetURL');
@@ -203,7 +214,7 @@ class _ImpactScreenState extends State<ImpactScreen>
         //_getOrganizationWidget(context),
       ],
     );
-
+  */
     controller = AnimationController(
       duration: const Duration(milliseconds: 1300),
       vsync: this,
@@ -217,9 +228,9 @@ class _ImpactScreenState extends State<ImpactScreen>
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: allData,
-        builder: ((BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+    return StreamBuilder(
+        stream: null,
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -262,33 +273,48 @@ class _ImpactScreenState extends State<ImpactScreen>
                         showTicks: true,
                         showDigitalClock: false,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15, bottom: 10),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 15, bottom: 3),
                         child: Text(
-                          (snapshot.data[0][2] * animation.value)
-                              .toInt()
-                              .toString(),
-                          style: const TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold),
+                          "Hours Volunteered",
+                          style: TextStyle(fontSize: 18),
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child:
-                            logOutWidget(), //log out function logs people from google and firebase //Text("Volunteer hours donated"),
-                      ),
-                      // '\$${h}',
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Text(
-                          "\$${(snapshot.data[0][1] * animation.value).toInt().toString()}",
+                          (68713 * animation.value).toInt().toString(),
                           style: const TextStyle(
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child: Text("Volunteer dollars donated"),
+                        padding: EdgeInsets.only(bottom: 3),
+                        child: Text(
+                          "Donated",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/dollar.png',
+                              width: 23,
+                              height: 23,
+                            ),
+                            Padding(
+                                padding: EdgeInsets.only(left: 5, right: 23),
+                                child: Text(
+                                  "${(56489 * animation.value).toInt().toString()}",
+                                  style: const TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                          ],
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 26),
@@ -300,9 +326,55 @@ class _ImpactScreenState extends State<ImpactScreen>
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: _createOrganizationWidget(
-                                context, snapshot.data[2])),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ClipOval(
+                              child: Image.asset(
+                                'assets/images/img.png',
+                                height: 45,
+                                width: 45,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            ClipOval(
+                              child: Image.asset(
+                                'assets/images/img.png',
+                                height: 45,
+                                width: 45,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            ClipOval(
+                              child: Image.asset(
+                                'assets/images/img.png',
+                                height: 45,
+                                width: 45,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            ClipOval(
+                              child: Image.asset(
+                                'assets/images/img.png',
+                                height: 45,
+                                width: 45,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                print("object");
+                                Provider.of<MainScreenViewModel>(this.context,
+                                        listen: false)
+                                    .setWidget(const OrganizationScreen());
+                              },
+                              child: SvgPicture.asset(
+                                "assets/svg/arrow_right.svg",
+                                width: 15,
+                                height: 15,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 22, bottom: 20),
@@ -311,21 +383,22 @@ class _ImpactScreenState extends State<ImpactScreen>
                           child: const Text("Recent Activity"),
                         ),
                       ),
-
-                      Column(
-                          children: _createRecentActivityWidget(
-                              2, snapshot.data[0][0], snapshot.data[0][4])),
-
+                      RecentActivityWidget(
+                          activity: Activity("assets/images/img_1.png",
+                              "Autism Speaks", "3 hours", "Oct 25, 2021")),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: RecentActivityWidget(
+                            activity: Activity("assets/images/img_2.png",
+                                "World Concern", "3 hours", "Oct 25, 2021")),
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(top: 15),
                         child: GestureDetector(
                           onTap: () {
                             Provider.of<MainScreenViewModel>(this.context,
                                     listen: false)
-                                .setWidget(RecentActivityScreen(
-                              list: snapshot.data[0][0],
-                              URLList: snapshot.data[0][4],
-                            ));
+                                .setWidget(RecentActivityScreen());
                           },
                           child: Row(
                             children: [
@@ -377,28 +450,30 @@ class _ImpactScreenState extends State<ImpactScreen>
                             const Text("Donated"),
                             const Expanded(child: SizedBox()),
                             Text(
-                              "\$${(snapshot.data[0][2] * animation.value).toInt().toString()}",
+                              "\$${(880 * animation.value).toInt().toString()}",
                             )
                           ],
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 20, bottom: 20),
+                        padding: const EdgeInsets.only(top: 20, bottom: 26),
                         child: Row(
-                          children: [
-                            const Text("Participated Event"),
-                            const Expanded(child: SizedBox()),
-                            Text(snapshot.data[0][3].toString())
+                          children: const [
+                            Text("Participated Event"),
+                            Expanded(child: SizedBox()),
+                            Text(
+                              "9",
+                            )
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
             ));
           }
-        }));
+        });
   }
 
   @override
