@@ -433,7 +433,7 @@ class _ImpactScreenState extends State<ImpactScreen>
                                 onTap: () {
                                   Provider.of<MainScreenViewModel>(this.context,
                                           listen: false)
-                                      .setWidget(const PerformanceScreen());
+                                      .setWidget(PerformanceScreen());
                                 },
                                 child: const Text(
                                   "See Performance",
