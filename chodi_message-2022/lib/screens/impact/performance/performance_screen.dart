@@ -20,8 +20,8 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
   late Color _weekBg, _monthBg, _yearBg;
   late Widget _timeWidget;
 
-  late var month;
-  late var year;
+  var year = int.parse(DateFormat('yyyy').format(DateTime.now()));
+  var month = int.parse(DateFormat.M().format(DateTime.now())) - 1;
 
   var selectorType = 0;
   List<String> monthList = [];
@@ -36,9 +36,6 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
     _yearBg = _timeUnSelectedColor;
     _timeWidget = _getWeekWidget();
     _setupMonthList();
-
-    year = int.parse(DateFormat('yyyy').format(DateTime.now()));
-    month = int.parse(DateFormat.M().format(DateTime.now())) - 1;
   }
 
   @override
@@ -92,7 +89,7 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                 ),
                 onTap: () {
                   selectorType = 0;
-                  _updateSelectedTime(0);
+                  _updateSelectedTime(selectorType);
                 },
               ),
               GestureDetector(
@@ -208,7 +205,6 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                   if (month > 0) {
                     month = month - 1;
                     _timeWidget = _getMonthWidget();
-                    log(month.toString());
                   }
                 });
               },
@@ -223,8 +219,6 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                   if (month < 12) {
                     month = month + 1;
                     _timeWidget = _getMonthWidget();
-
-                    log(month.toString());
                   }
                 });
               },
@@ -260,7 +254,7 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
             ),
             Padding(
                 padding: const EdgeInsets.only(left: 8, right: 8),
-                child: Text("Year ${year}")),
+                child: Text("Year $year")),
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -312,8 +306,6 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
             _timeWidget = _getMonthWidget();
           });
           Navigator.pop(context);
-
-          log(i.toString());
         },
       ));
     }

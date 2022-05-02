@@ -8,10 +8,14 @@ import 'package:intl/intl.dart';
 
 class LineChart extends StatefulWidget {
   final int selectorType;
-  final int month =
-      int.parse(DateFormat.M().format(DateTime.now())) - 1; //default Jan
-  final int year = int.parse(DateFormat('yyyy').format(DateTime.now()));
-  LineChart({Key? key, required this.selectorType, month, year})
+  final int month; //default Jan
+  final int year;
+
+  const LineChart(
+      {Key? key,
+      required this.selectorType,
+      required this.month,
+      required this.year})
       : super(key: key);
   @override
   State<LineChart> createState() => _LineChartState();
@@ -32,10 +36,6 @@ class _LineChartState extends State<LineChart> {
   @override
   void initState() {
     super.initState();
-
-    chartDataList = FirebaseFirestore.instance
-        .collection("EndUsers/" + userUID + "/History")
-        .snapshots();
   }
 
   _resetChartData() {
@@ -48,19 +48,9 @@ class _LineChartState extends State<LineChart> {
     maxDonations = 0;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    //print selectorType
-    //log(widget.selectorType.toString());
-    //log(widget.month.toString());
-    //log(widget.year.toString());
-
-    _resetChartData();
-
-    if (widget.selectorType == 0) {
+  _chooseFirebaseStream(int selectorType) {
+    if (selectorType == 0) {
       //week
-      log('day');
-
       chartDataList = FirebaseFirestore.instance
           .collection("EndUsers/" + userUID + "/History")
           .where("date", isLessThanOrEqualTo: DateTime.now())
@@ -68,45 +58,44 @@ class _LineChartState extends State<LineChart> {
               isGreaterThanOrEqualTo:
                   DateTime.now().subtract(const Duration(days: 7)))
           .snapshots();
-    } else if (widget.selectorType == 1) {
+    } else if (selectorType == 1) {
       //month
-      List<int> months = [
-        DateTime.january,
-        DateTime.february,
-        DateTime.march,
-        DateTime.april,
-        DateTime.june,
-        DateTime.july,
-        DateTime.august,
-        DateTime.september,
-        DateTime.october,
-        DateTime.november,
-        DateTime.december,
-      ];
 
-      int daysInAMonth = DateTime(widget.year, months[widget.month] + 1, 0).day;
+      //get days for month in a specific year
+      int daysInAMonth = DateTime(widget.year, widget.month + 2, 0).day;
 
       chartDataList = FirebaseFirestore.instance
           .collection("EndUsers/" + userUID + "/History")
-          .where("date", isLessThanOrEqualTo: DateTime.now())
           .where("date",
-              isGreaterThanOrEqualTo:
-                  DateTime.now().subtract(Duration(days: daysInAMonth)))
+              isLessThanOrEqualTo: DateTime(widget.year, widget.month + 2, 0))
+          .where("date",
+              isGreaterThanOrEqualTo: DateTime(widget.year, widget.month + 2, 0)
+                  .subtract((Duration(days: daysInAMonth))))
           .snapshots();
     } else {
       //year
-      int daysInAYear = 365;
-      if (widget.year % 4 == 0) {
-        daysInAYear = 366;
-      }
+
       chartDataList = FirebaseFirestore.instance
           .collection("EndUsers/" + userUID + "/History")
-          .where("date", isLessThanOrEqualTo: DateTime.now())
+          .where("date",
+              isLessThanOrEqualTo:
+                  DateTime(widget.year + 1, DateTime.january, 0))
           .where("date",
               isGreaterThanOrEqualTo:
-                  DateTime.now().subtract(Duration(days: daysInAYear)))
+                  DateTime(widget.year, DateTime.january, 1))
           .snapshots();
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //print selectorType
+    log(widget.selectorType.toString());
+    log(widget.month.toString());
+    log(widget.year.toString());
+    _resetChartData();
+
+    _chooseFirebaseStream(widget.selectorType);
 
     return StreamBuilder(
         stream: chartDataList,
@@ -116,8 +105,9 @@ class _LineChartState extends State<LineChart> {
           } else if (snapshot.hasError) {
             return Container();
           } else {
-            var date = DateFormat('M-d').format(DateTime.now());
             for (var i in snapshot.data!.docs) {
+              var date = DateFormat('M-d').format(i["date"].toDate());
+
               if (i["IsEvent"] == true && i["showedUp"] == true) {
                 if (i["hours"].toDouble() > maxEventHours) {
                   maxEventHours = i["hours"].toDouble();
@@ -154,7 +144,7 @@ class _LineChartState extends State<LineChart> {
                             color: Color(0xFFF4A164),
                             borderRadius: BorderRadius.all(Radius.circular(5))),
                       ),
-                      const Text("\$")
+                      const Text("cost in dollars")
                     ],
                   )),
               Expanded(
@@ -194,7 +184,7 @@ class _LineChartState extends State<LineChart> {
                   child: Text("Volunteered: $totalHours hours")),
               Padding(
                   padding: const EdgeInsets.only(top: 10),
-                  child: Text("Event: $numberOfEvents")),
+                  child: Text("Events: $numberOfEvents")),
               Padding(
                   padding: const EdgeInsets.only(top: 20, bottom: 10),
                   child: Row(
