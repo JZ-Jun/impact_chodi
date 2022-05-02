@@ -14,16 +14,16 @@ class RecentActivityWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ClipOval(
-          child: Image.network(activity.img!,
-              height: 36, width: 36, fit: BoxFit.cover),
           /*
+          child: Image.network(activity.img!,
+              height: 36, width: 36, fit: BoxFit.cover),*/
+
           child: Image.asset(
             activity.img!,
             height: 36,
             width: 36,
             fit: BoxFit.fill,
           ),
-          */
         ),
         Expanded(
             child: Padding(

@@ -8,6 +8,7 @@ import '../firebase_authentication_service.dart';
 
 //Create a text link to log out of Chodi*/
 
+// ignore: camel_case_types
 class logOutWidget extends StatefulWidget {
   const logOutWidget({Key? key}) : super(key: key);
 
@@ -15,6 +16,7 @@ class logOutWidget extends StatefulWidget {
   _logOutWidgetState createState() => _logOutWidgetState();
 }
 
+// ignore: camel_case_types
 class _logOutWidgetState extends State<logOutWidget> {
   FirebaseService fbservice = FirebaseService();
 

@@ -127,6 +127,7 @@ class FirebaseService extends ChangeNotifier {
           age: '',
           securityQuestion: '',
           securityQuestionAnswer: '',
+          lastUpdated: Timestamp.now(),
           registeredFor: {},
         );
         return chodiUser;
@@ -137,6 +138,7 @@ class FirebaseService extends ChangeNotifier {
           age: personalInfo['Age'],
           securityQuestionAnswer: personalInfo["SecurityQuestionAnswer"],
           securityQuestion: personalInfo["SecurityQuestion"],
+          lastUpdated: Timestamp.now(),
           registeredFor: {},
         );
         return chodiUser;
@@ -178,6 +180,7 @@ class FirebaseService extends ChangeNotifier {
                 age: allData[i]['Age'],
                 securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
                 securityQuestion: allData[i]["SecurityQuestion"],
+                lastUpdated: Timestamp.now(),
                 registeredFor: {},
               );
               return chodiUser;
@@ -315,7 +318,8 @@ class FirebaseService extends ChangeNotifier {
   }
 
   //Registration for Event
-  Future registerForEvent(var eventID, var ngoEIN, var availableSpace) async {
+  Future registerForEvent(var eventName, var eventID, var ngoEIN,
+      var totalSpaceTaken, var endTime) async {
     final user = _auth.currentUser;
 
     if (user != null) {
@@ -326,17 +330,23 @@ class FirebaseService extends ChangeNotifier {
           .collection("Nonprofits/" + ngoEIN + "/Events");
 
       await endUsers.doc(user.uid).update({
-        'registeredFor.$eventID': Timestamp.now(),
+        'registeredFor.$eventID': {
+          'Name': eventName,
+          'timeRegisteredAt': Timestamp.now(),
+          'EIN': ngoEIN,
+          'endTime': endTime,
+        }
       });
 
       await nonprofits.doc(eventID).update({
         'Volunteers.${user.uid}': Timestamp.now(),
-        'availableSpace': availableSpace
+        'totalSpaceTaken': totalSpaceTaken
       });
     }
   }
 
-  Future unregisterForEvent(var eventID, var ngoEIN, var availableSpace) async {
+  Future deregisterForEvent(
+      var eventID, var ngoEIN, var totalSpaceTaken) async {
     final user = _auth.currentUser;
 
     if (user != null) {
@@ -352,7 +362,7 @@ class FirebaseService extends ChangeNotifier {
 
       await nonprofits.doc(eventID).update({
         'Volunteers.${user.uid}': FieldValue.delete(),
-        'availableSpace': availableSpace
+        'totalSpaceTaken': totalSpaceTaken
       });
     }
   }
