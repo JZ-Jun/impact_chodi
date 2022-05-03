@@ -148,7 +148,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
         });
   }
 
-  Future _updateNearby({double dist = 10}) async {
+  Future updateNearbyLocation({double dist = 10}) async {
     var position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
@@ -179,7 +179,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
           setState(() {
             //update if service enabled
             userLocation.determinePosition().then((res) {
-              _updateNearby(dist: 40);
+              updateNearbyLocation(dist: 200);
             });
           });
         },

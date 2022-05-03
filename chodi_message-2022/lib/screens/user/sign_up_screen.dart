@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/models/user.dart';
@@ -395,6 +396,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         securityQuestionAnswer:
                             securityQuestionAnswerController.text,
                         securityQuestion: securityQuestionController.text,
+                        lastUpdated: Timestamp.now(),
                         registeredFor: {},
                       );
 

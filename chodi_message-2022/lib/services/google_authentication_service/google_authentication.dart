@@ -120,21 +120,6 @@ class GoogleAuthentication extends ChangeNotifier {
     }
   }
 
-/*
-  Future updateGoogleUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      CollectionReference chodiUsers =
-          FirebaseFirestore.instance.collection('EndUsers');
-
-      await chodiUsers.doc(user.uid).set({
-        "Email": user.email,
-        "Username": user.displayName,
-      });
-    }
-  }
-  */
-
   //get "given_name" and "family_name" using idtoken
   static Map<String, dynamic>? getGivenAndFamilyName(String token) {
     // validate token
