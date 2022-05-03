@@ -6,6 +6,7 @@ import 'package:flutter_chodi_app/screens/impact/organization_screen.dart';
 import 'package:flutter_chodi_app/screens/impact/performance/performance_screen.dart';
 import 'package:flutter_chodi_app/screens/impact/recent_activity_screen.dart';
 import 'package:flutter_chodi_app/services/firebase_authentication_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_chodi_app/services/firebase_storage_service.dart';
 import 'package:flutter_chodi_app/services/google_authentication_service/log_out_button.dart';
 import 'package:flutter_chodi_app/viewmodel/main_view_model.dart';
@@ -113,10 +114,10 @@ List<Widget> _createOrganizationWidget(BuildContext context,
     if (impacts.isEmpty) {
       avatars.add(const Text(''));
     } else {
-      //print(impacts) ;
+      print(impacts) ;
       for (var i = 0; i < impacts.length; i++) {
         if (i < 4) {
-          //print(NGOs) ;
+          print(NGOs) ;
           avatars.add(ProfileAvatar(
               assetURL: NGOs[i].returnImpactImageURL()
                ));
@@ -196,10 +197,17 @@ class _ImpactScreenState extends State<ImpactScreen>
   void initState() {
     super.initState();
 
+
+    String? uid = FirebaseAuth.instance.currentUser?.uid ;
+
+    print(uid) ;
+
+
     //Grab the user information
     impactList = FirebaseFirestore.instance
       .collection("EndUsers")
-      .doc("SM5W6pnRdqMgQW1znKusvHXpjHT2")
+      //.doc("SM5W6pnRdqMgQW1znKusvHXpjHT2")
+      .doc(uid)
       .collection("History")
       .orderBy("date", descending: true)
       .snapshots() ;
@@ -239,6 +247,8 @@ class _ImpactScreenState extends State<ImpactScreen>
   num totalDonations = 0 ;
   int totalHours = 0 ;
   int eventsJoined = 0 ;
+  final user = FirebaseAuth.instance.currentUser ;
+
 
   @override
   Widget build(BuildContext context) {
