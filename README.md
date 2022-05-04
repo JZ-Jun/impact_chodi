@@ -4,6 +4,7 @@ A new Flutter project.
 # chodi_impact module.
 # chodi_for you module.
 # chodi_message module.
+# chodi_events module.
 # Code: Jun Zhu, Yuxi Ge, Yilin Li, Database: James,Ashley
 
 
