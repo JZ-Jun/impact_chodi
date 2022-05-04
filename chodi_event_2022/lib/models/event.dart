@@ -14,7 +14,7 @@ class Event {
   Timestamp startTime;
   Timestamp endTime;
   String? notes;
-  int totalSpaceTaken;
+  int availableSpace;
   int totalSpace;
   Map<dynamic, dynamic> volunteers;
 
@@ -32,7 +32,7 @@ class Event {
       required this.startTime,
       required this.endTime,
       this.notes,
-      required this.totalSpaceTaken,
+      required this.availableSpace,
       required this.totalSpace,
       required this.volunteers});
 
@@ -53,7 +53,7 @@ class Event {
         startTime: data['startTime'],
         endTime: data['endTime'],
         notes: data['Notes'] ?? '',
-        totalSpaceTaken: data['totalSpaceTaken'] ?? 0,
+        availableSpace: data['totalSpaceTaken'] ?? 0,
         totalSpace: data['totalSpace'] ?? 0,
         volunteers: data['Volunteers'] ?? {});
   }
