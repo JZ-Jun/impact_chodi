@@ -16,7 +16,7 @@ class ProfileAvatar extends StatelessWidget {
       //Displays image retrieved from Firebase
       child: CircleAvatar(
         child:
-            Image.asset(assetURL), //Image.network(assetURL, fit: BoxFit.cover),
+            Image.network(assetURL, fit: BoxFit.cover),
         backgroundColor: Colors.transparent,
       ),
     );
