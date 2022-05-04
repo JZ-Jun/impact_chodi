@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\google_sign_in\\intermediates\\res\\merged\\debug\\color\\common_google_signin_btn_text_dark.xml",
+        "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\d3a78be849e49d981c1fec54df7b0e20\\transformed\\jetified-play-services-base-18.0.1\\res\\color\\common_google_signin_btn_text_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\google_sign_in\\intermediates\\res\\merged\\debug\\color\\common_google_signin_btn_text_light.xml",
+        "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\d3a78be849e49d981c1fec54df7b0e20\\transformed\\jetified-play-services-base-18.0.1\\res\\color\\common_google_signin_btn_text_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\google_sign_in\\intermediates\\res\\merged\\debug\\color\\common_google_signin_btn_tint.xml",
+        "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\d3a78be849e49d981c1fec54df7b0e20\\transformed\\jetified-play-services-base-18.0.1\\res\\color\\common_google_signin_btn_tint.xml"
+    }
+]
