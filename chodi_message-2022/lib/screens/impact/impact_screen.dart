@@ -468,7 +468,7 @@ class _ImpactScreenState extends State<ImpactScreen>
                                 padding: const EdgeInsets.only(top: 20),
                                 child: Row(
                                   children: [
-                                    Text("Donated"),
+                                    const Text("Donated"),
                                     const Expanded(child: SizedBox()),
                                     Text(
                                       (totalDonations * animation.value)
