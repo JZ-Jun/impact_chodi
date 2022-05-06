@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/models/activity.dart';
 import 'package:flutter_chodi_app/models/impact.dart';
-import 'package:flutter_chodi_app/models/nonprofit_organization.dart' ;
+import 'package:flutter_chodi_app/models/nonprofit_organization.dart';
 import 'package:flutter_chodi_app/screens/impact/organization_screen.dart';
 import 'package:flutter_chodi_app/screens/impact/performance/performance_screen.dart';
 import 'package:flutter_chodi_app/screens/impact/recent_activity_screen.dart';
@@ -26,7 +26,6 @@ Storage storage = Storage();
 late Future recentHistoryData;
 late Future supportedOrganizationsData;
 late Future organizationImageURLs;*/
-
 
 class ImpactScreen extends StatefulWidget {
   const ImpactScreen({Key? key}) : super(key: key);
@@ -108,24 +107,20 @@ Future<List<dynamic>> _getSupportedOrganizations([dataField]) async {
 
 }*/
 
-
 //navigate to detail_page.dart later
-List<Widget> _createOrganizationWidget(BuildContext context,
-    List<Impact>? impacts, List<NonProfitOrg> NGOs) {
+List<Widget> _createOrganizationWidget(
+    BuildContext context, List<Impact>? impacts, List<NonProfitOrg> NGOs) {
   var avatars = <Widget>[];
-
 
   if (impacts != null) {
     if (impacts.isEmpty) {
       avatars.add(const Text(''));
     } else {
-      print(impacts) ;
+      print(impacts);
       for (var i = 0; i < impacts.length; i++) {
         if (i < 4) {
-          print(NGOs) ;
-          avatars.add(ProfileAvatar(
-              assetURL: NGOs[i].returnImpactImageURL()
-               ));
+          print(NGOs);
+          avatars.add(ProfileAvatar(assetURL: NGOs[i].returnImpactImageURL()));
         } else {
           break;
         }
@@ -150,8 +145,8 @@ List<Widget> _createOrganizationWidget(BuildContext context,
 
 //navigate to event_detail_page
 
-List<Widget> _createRecentActivityWidget(recentAmount,
-    List<Impact> impactList, List<NonProfitOrg> NGOs) {
+List<Widget> _createRecentActivityWidget(
+    recentAmount, List<Impact> impactList, List<NonProfitOrg> NGOs) {
   var list = <Widget>[];
   String activityResults = '';
   String date = '';
@@ -162,24 +157,33 @@ List<Widget> _createRecentActivityWidget(recentAmount,
       if (i < recentAmount) {
         date = DateFormat.yMMMd().format(impactList[i].returnDate().toDate());
         if (impactList[i].isEvent == true) {
-          activityResults = impactList[i].returnHours().toString() + ' hours' ;
+          activityResults = impactList[i].returnHours().toString() + ' hours';
         } else if (impactList[i].isEvent == false) {
-          activityResults = impactList[i].returnDonations().toString() + ' dollars';
+          activityResults =
+              impactList[i].returnDonations().toString() + ' dollars';
         }
 
         if (i == 0) {
           list.add(Padding(
             padding: const EdgeInsets.all(0),
             child: RecentActivityWidget(
-                activity: Activity(getNonProfit(NGOs, impactList[i].returnEIN()).returnImpactImageURL(),
-                    getNonProfit(NGOs, impactList[i].returnEIN()).returnName(), activityResults, date)),
+                activity: Activity(
+                    getNonProfit(NGOs, impactList[i].returnEIN())
+                        .returnImpactImageURL(),
+                    getNonProfit(NGOs, impactList[i].returnEIN()).returnName(),
+                    activityResults,
+                    date)),
           ));
         } else {
           list.add(Padding(
             padding: const EdgeInsets.only(top: 20),
             child: RecentActivityWidget(
-                activity: Activity(getNonProfit(NGOs, impactList[i].returnEIN()).returnImpactImageURL(),
-                    getNonProfit(NGOs, impactList[i].returnEIN()).returnName(), activityResults, date)),
+                activity: Activity(
+                    getNonProfit(NGOs, impactList[i].returnEIN())
+                        .returnImpactImageURL(),
+                    getNonProfit(NGOs, impactList[i].returnEIN()).returnName(),
+                    activityResults,
+                    date)),
           ));
         }
       }
@@ -194,10 +198,8 @@ class _ImpactScreenState extends State<ImpactScreen>
   late Animation<double> animation;
   late AnimationController controller;
 
-
-  late Stream impactList ;
-  late Stream allNGOs ;
-
+  late Stream impactList;
+  late Stream allNGOs;
 
   //late final Future allData;
   //String totalEventsParticipatedIn = '';
@@ -206,23 +208,20 @@ class _ImpactScreenState extends State<ImpactScreen>
   void initState() {
     super.initState();
 
-    String? uid = FirebaseAuth.instance.currentUser?.uid ;
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-    print(uid) ;
-
+    print(uid);
 
     //Grab the user information
     impactList = FirebaseFirestore.instance
-      .collection("EndUsers")
-      //.doc("SM5W6pnRdqMgQW1znKusvHXpjHT2")
-      .doc(uid)
-      .collection("History")
-      .orderBy("date", descending: true)
-      .snapshots() ;
+        .collection("EndUsers")
+        //.doc("SM5W6pnRdqMgQW1znKusvHXpjHT2")
+        .doc(uid)
+        .collection("History")
+        .orderBy("date", descending: true)
+        .snapshots();
 
-    allNGOs = FirebaseFirestore.instance
-      .collection("Nonprofits")
-      .snapshots() ;
+    allNGOs = FirebaseFirestore.instance.collection("Nonprofits").snapshots();
 
     /*recentHistoryData = _getRecentHistoryDataImpact(10); //START AT 10
 
@@ -251,244 +250,251 @@ class _ImpactScreenState extends State<ImpactScreen>
   }
 
   //stores data for each impact event the user has participated in
-  List<Impact> Impacts = [] ;
+  List<Impact> Impacts = [];
   List<NonProfitOrg> NGOList = [];
-  num totalDonations = 0 ;
-  int totalHours = 0 ;
-  int eventsJoined = 0 ;
-  final user = FirebaseAuth.instance.currentUser ;
-
+  num totalDonations = 0;
+  int totalHours = 0;
+  int eventsJoined = 0;
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
-
     return StreamBuilder(
-      stream: impactList,
-      builder: (BuildContext context , AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting){
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Container();
-        } else {
-          Impacts.clear() ;
-          num totalDonations = 0 ;
-          num totalHours = 0 ;
-          int eventsJoined = 0 ;
+        stream: impactList,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Container();
+          } else {
+            Impacts.clear();
+            num totalDonations = 0;
+            num totalHours = 0;
+            int eventsJoined = 0;
 
-          //add the impact events to a list we can more easily manipulate
-          for (var i in snapshot.data!.docs){
-            //print(snapshot.data!.docs) ;
-            Impacts.add(Impact.fromFirestore(i)) ;
-            //print(Impacts) ;
-          }
-
-          //figure out how many dollarydoos the user has donated
-          for (int i = 0; i < Impacts.length ; i++){
-            totalDonations += Impacts[i].returnDonations() ;
-          }
-          //figure out how many hours the user has donated
-          for (int i = 0; i < Impacts.length ; i++){
-            totalHours += Impacts[i].returnHours() ;
-          }
-          //figure out how many different events the user has been in
-          for (int i = 0; i < Impacts.length ; i++){
-            if (Impacts[i].returnIsEvent() == true) {
-              eventsJoined++ ;
+            //add the impact events to a list we can more easily manipulate
+            for (var i in snapshot.data!.docs) {
+              //print(snapshot.data!.docs) ;
+              Impacts.add(Impact.fromFirestore(i));
+              //print(Impacts) ;
             }
-          }
 
-          return StreamBuilder(
-              stream: allNGOs,
-              builder: (context , AsyncSnapshot snapshot){
-                NGOList.clear() ;
+            //figure out how many dollarydoos the user has donated
+            for (int i = 0; i < Impacts.length; i++) {
+              totalDonations += Impacts[i].returnDonations();
+            }
+            //figure out how many hours the user has donated
+            for (int i = 0; i < Impacts.length; i++) {
+              totalHours += Impacts[i].returnHours();
+            }
+            //figure out how many different events the user has been in
+            for (int i = 0; i < Impacts.length; i++) {
+              if (Impacts[i].returnIsEvent() == true) {
+                eventsJoined++;
+              }
+            }
 
-                for (var i in snapshot.data!.docs){
-                  NGOList.add(NonProfitOrg.fromFirestore(i)) ;
-                }
+            return StreamBuilder(
+                stream: allNGOs,
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Container();
+                  } else if (snapshot.hasData) {
+                    NGOList.clear();
 
+                    for (var i in snapshot.data!.docs) {
+                      NGOList.add(NonProfitOrg.fromFirestore(i));
+                    }
+                  }
 
-
-
-
-          return Scaffold(
-              body: Padding(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 10,
-                    left: 16,
-                    right: 16),
-                child: SingleChildScrollView(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: const Text(
-                            "Hi there",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                        AnalogClock(
-                          decoration: BoxDecoration(
-                              border: Border.all(width: 2.0, color: Colors.black),
-                              color: Colors.transparent,
-                              shape: BoxShape.circle),
-                          width: 100.0,
-                          height: 100.0,
-                          isLive: true,
-                          hourHandColor: Colors.black,
-                          minuteHandColor: Colors.black,
-                          showSecondHand: true,
-                          numberColor: Colors.black87,
-                          showNumbers: true,
-                          showAllNumbers: true,
-                          textScaleFactor: 1.4,
-                          showTicks: true,
-                          showDigitalClock: false,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, bottom: 10),
-                          child: Text(
-                            (totalHours * animation.value)
-                                .toInt()
-                                .toString(),
-                            style: const TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child:
-                          logOutWidget(), //log out function logs people from google and firebase //Text("Volunteer hours donated"),
-                        ),
-                        // '\$${h}',
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Text(
-                            "\$${(totalDonations * animation.value).toInt().toString()}",
-                            style: const TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Text("Volunteer dollars donated"),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 26),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            child: const Text("Organizations You Support"),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: _createOrganizationWidget(
-                                  context, Impacts, NGOList)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 22, bottom: 20),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            child: const Text("Recent Activity"),
-                          ),
-                        ),
-
-                        Column(
-                            children: _createRecentActivityWidget(
-                                2, Impacts, NGOList)),
-
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15),
-                          child: GestureDetector(
-                            onTap: () {
-                              Provider.of<MainScreenViewModel>(this.context,
-                                  listen: false)
-                                  .setWidget(RecentActivityScreen(
-                                list: snapshot.data[0][0],
-                                URLList: snapshot.data[0][4],
-                              ));
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(child: SizedBox()),
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 6),
-                                  child: Text("More",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF0000FF))),
-                                ),
-                                SvgPicture.asset(
-                                  "assets/svg/arrow_right.svg",
-                                  width: 13,
-                                  height: 13,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Row(
-                            children: [
-                              const Text(
-                                "What you’ve done",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
+                  return Scaffold(
+                      body: Padding(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top + 10,
+                        left: 16,
+                        right: 16),
+                    child: SingleChildScrollView(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: const Text(
+                                "Hi there",
+                                style: TextStyle(fontSize: 18),
                               ),
-                              const Expanded(child: SizedBox()),
-                              GestureDetector(
-                                  onTap: () {
-                                    Provider.of<MainScreenViewModel>(this.context,
-                                        listen: false)
-                                        .setWidget(PerformanceScreen());
-                                  },
-                                  child: const Text(
-                                    "See Performance",
+                            ),
+                            AnalogClock(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 2.0, color: Colors.black),
+                                  color: Colors.transparent,
+                                  shape: BoxShape.circle),
+                              width: 100.0,
+                              height: 100.0,
+                              isLive: true,
+                              hourHandColor: Colors.black,
+                              minuteHandColor: Colors.black,
+                              showSecondHand: true,
+                              numberColor: Colors.black87,
+                              showNumbers: true,
+                              showAllNumbers: true,
+                              textScaleFactor: 1.4,
+                              showTicks: true,
+                              showDigitalClock: false,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 15, bottom: 10),
+                              child: Text(
+                                (totalHours * animation.value)
+                                    .toInt()
+                                    .toString(),
+                                style: const TextStyle(
+                                    fontSize: 30, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 10),
+                              child: Text("Hours donated"),
+                            ),
+                            // '\$${h}',
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Text(
+                                "\$${(totalDonations * animation.value).toInt().toString()}",
+                                style: const TextStyle(
+                                    fontSize: 30, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 10),
+                              child: Text("Volunteer dollars donated"),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 26),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: const Text("Organizations You Support"),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: _createOrganizationWidget(
+                                      context, Impacts, NGOList)),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 22, bottom: 20),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: const Text("Recent Activity"),
+                              ),
+                            ),
+
+                            Column(
+                                children: _createRecentActivityWidget(
+                                    2, Impacts, NGOList)),
+
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Provider.of<MainScreenViewModel>(this.context,
+                                          listen: false)
+                                      .setWidget(RecentActivityScreen(
+                                    list: snapshot.data[0][0],
+                                    URLList: snapshot.data[0][4],
+                                  ));
+                                },
+                                child: Row(
+                                  children: [
+                                    const Expanded(child: SizedBox()),
+                                    const Padding(
+                                      padding: EdgeInsets.only(right: 6),
+                                      child: Text("More",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF0000FF))),
+                                    ),
+                                    SvgPicture.asset(
+                                      "assets/svg/arrow_right.svg",
+                                      width: 13,
+                                      height: 13,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    "What you’ve done",
                                     style: TextStyle(
-                                        fontSize: 12, color: Color(0xFF0000FF)),
-                                  )),
-                            ],
-                          ),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const Expanded(child: SizedBox()),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Provider.of<MainScreenViewModel>(
+                                                this.context,
+                                                listen: false)
+                                            .setWidget(PerformanceScreen());
+                                      },
+                                      child: const Text(
+                                        "See Performance",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF0000FF)),
+                                      )),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Row(
+                                children: [
+                                  Text("Donated"),
+                                  const Expanded(child: SizedBox()),
+                                  Text(
+                                    (totalDonations * animation.value)
+                                        .toInt()
+                                        .toString(),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 20, bottom: 20),
+                              child: Row(
+                                children: [
+                                  const Text("Participated Event"),
+                                  const Expanded(child: SizedBox()),
+                                  Text(eventsJoined.toString())
+                                ],
+                              ),
+                            )
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Row(
-                            children: [
-                              Text("Donated"),
-                              const Expanded(child: SizedBox()),
-                              Text(
-                                (totalDonations * animation.value).toInt().toString(),
-                              )
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 20),
-                          child: Row(
-                            children: [
-                              const Text("Participated Event"),
-                              const Expanded(child: SizedBox()),
-                              Text(eventsJoined.toString())
-                            ],
-                          ),
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ));
+                  ));
+                });
+          }
         });
-      }
-        }
-    );
 
-
-  /*  return FutureBuilder(
+    /*  return FutureBuilder(
         future: allData,
         builder: ((BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

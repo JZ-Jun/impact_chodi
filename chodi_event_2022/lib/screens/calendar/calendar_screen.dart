@@ -137,21 +137,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
               color: Colors.transparent,
               child: Container(
                   child: Container(
-                      margin: EdgeInsets.only(top: 100, bottom: 100),
-                      padding: EdgeInsets.only(left: 15, right: 15),
+                      margin: const EdgeInsets.only(top: 100, bottom: 10),
+                      padding: const EdgeInsets.only(left: 15, right: 15),
                       decoration: BoxDecoration(
                           color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(15),
                               topRight: Radius.circular(15))),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           GestureDetector(
                               onTap: () => Navigator.pop(context),
                               child: Icon(Icons.keyboard_arrow_down, size: 30)),
-                          SizedBox(height: 15),
+                          const SizedBox(height: 15),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -166,7 +166,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 15),
+                          const SizedBox(height: 15),
                           Container(
                             alignment: Alignment.center,
                             child: RCalendarWidget(

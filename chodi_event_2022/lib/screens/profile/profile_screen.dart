@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/screens/calendar/search_event_page.dart';
 import 'package:flutter_chodi_app/screens/foryou/search_page.dart';
 import 'package:flutter_chodi_app/screens/user/login_screen.dart';
+import 'package:flutter_chodi_app/services/firebase_authentication_service.dart';
+import 'package:flutter_chodi_app/services/google_authentication_service/log_out_button.dart';
 import 'package:r_calendar/r_calendar.dart';
 
 import 'edit_profile_screen.dart';
@@ -17,6 +21,7 @@ class profile_screen extends StatefulWidget {
 }
 
 class profile_screenState extends State<profile_screen> {
+  FirebaseAuth _user = FirebaseAuth.instance;
   @override
   void initState() {
     super.initState();
@@ -46,14 +51,7 @@ class profile_screenState extends State<profile_screen> {
           SizedBox(height: 15),
           Icon(Icons.account_circle, size: 80),
           SizedBox(height: 10),
-          GestureDetector(
-              onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) {
-                  return LoginScreen();
-                }));
-              },
-              child: Text('Log out', style: TextStyle(color: Colors.blue))),
+          logOutWidget(),
           SizedBox(height: 20),
           Container(height: 1, color: Colors.grey.shade200),
           SizedBox(height: 20),
@@ -72,7 +70,9 @@ class profile_screenState extends State<profile_screen> {
               SizedBox(width: 10),
               Icon(Icons.phone, size: 30),
               SizedBox(width: 40),
-              Text('+1239876554'),
+              _user.currentUser!.phoneNumber != null
+                  ? Text(_user.currentUser!.phoneNumber.toString())
+                  : const Text(""),
             ],
           ),
           SizedBox(height: 15),
@@ -81,7 +81,7 @@ class profile_screenState extends State<profile_screen> {
               SizedBox(width: 10),
               Icon(Icons.email, size: 30),
               SizedBox(width: 40),
-              Text('info@chodi.today'),
+              Text(_user.currentUser!.email.toString()),
             ],
           )
         ],
