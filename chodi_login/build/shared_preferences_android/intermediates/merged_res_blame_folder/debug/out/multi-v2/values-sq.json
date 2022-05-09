@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\shared_preferences_android\\intermediates\\res\\merged\\debug\\values-sq\\values-sq.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\b7f1468b1b190405610154aea2660b23\\transformed\\core-1.6.0\\res\\values-sq\\values-sq.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\shared_preferences_android\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-sq\\values-sq.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\b7f1468b1b190405610154aea2660b23\\transformed\\core-1.6.0\\res\\values-sq\\values-sq.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    }
+                }
+            ]
+        }
+    ]
+}

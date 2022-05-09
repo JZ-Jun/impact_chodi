@@ -32,7 +32,7 @@ class _logOutWidgetState extends State<logOutWidget> {
         alignment: Alignment.bottomCenter,
         child: RichText(
           text: TextSpan(
-              text: 'Hours donated - Log Out: Testing Only',
+              text: 'Log Out',
               style: googleLinkTextStyle,
               recognizer: TapGestureRecognizer()
                 ..onTap = () {

@@ -31,7 +31,7 @@ class my_setting_screenState extends State<my_setting_screen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20),
-              Text('Account Setting'),
+              Text('Account Settings'),
               SizedBox(height: 30),
               GestureDetector(
                   onTap: () {

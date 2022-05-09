@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\shared_preferences_android\\intermediates\\res\\merged\\debug\\drawable\\notification_tile_bg.xml",
+        "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\b7f1468b1b190405610154aea2660b23\\transformed\\core-1.6.0\\res\\drawable\\notification_tile_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\shared_preferences_android\\intermediates\\res\\merged\\debug\\drawable\\notification_bg.xml",
+        "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\b7f1468b1b190405610154aea2660b23\\transformed\\core-1.6.0\\res\\drawable\\notification_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\shared_preferences_android\\intermediates\\res\\merged\\debug\\drawable\\notification_icon_background.xml",
+        "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\b7f1468b1b190405610154aea2660b23\\transformed\\core-1.6.0\\res\\drawable\\notification_icon_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\ajjst\\Downloads\\Chodi-TA-LOGIN\\chodi_login\\build\\shared_preferences_android\\intermediates\\res\\merged\\debug\\drawable\\notification_bg_low.xml",
+        "source": "C:\\Users\\ajjst\\.gradle\\caches\\transforms-3\\b7f1468b1b190405610154aea2660b23\\transformed\\core-1.6.0\\res\\drawable\\notification_bg_low.xml"
+    }
+]

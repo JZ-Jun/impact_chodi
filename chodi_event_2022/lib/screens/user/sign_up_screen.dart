@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/models/user.dart';
@@ -388,7 +389,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     } else if (!_checkboxValue) {
                       _showToast("Please agree to the Terms and Privacy");
                     } else {
-                      User user = User(
+                      chodiUser user = chodiUser(
                         email: emailController.text,
                         username: userNameController.text,
                         age: ageValue,
@@ -396,6 +397,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             securityQuestionAnswerController.text,
                         securityQuestion: securityQuestionController.text,
                         registeredFor: {},
+                        lastUpdated: Timestamp.now(),
                       );
 
                       final provider =

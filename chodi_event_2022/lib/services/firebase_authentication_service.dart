@@ -5,14 +5,14 @@ import 'package:flutter_chodi_app/screens/home_screen.dart';
 import 'package:flutter_chodi_app/screens/user/login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 // ignore: library_prefixes
-import 'package:flutter_chodi_app/models/user.dart' as ChodiUser;
+import 'package:flutter_chodi_app/models/user.dart';
 
 class FirebaseService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
 //Sign-up/Login Methods
   Future userSignUp(
-      ChodiUser.User user, String password, BuildContext context) async {
+      chodiUser user, String password, BuildContext context) async {
     String email = user.email;
     String username = user.username;
     String age = user.age;
@@ -35,6 +35,8 @@ class FirebaseService extends ChangeNotifier {
                       "Age": age,
                       "SecurityQuestion": securityQuestion,
                       "SecurityQuestionAnswer": securityQuestionAnswer,
+                      "lastUpdated": Timestamp.now(),
+                      "imageURL": '',
                     }).then((res) async => {
                               await FirebaseFirestore.instance
                                   .collection('Favorites')
@@ -108,7 +110,7 @@ class FirebaseService extends ChangeNotifier {
 
 //User must be logged in to use the this function
 //Does not access the subcollections of the User
-  Future<ChodiUser.User?> getDataOfCurrentUser() async {
+  Future<chodiUser?> getDataOfCurrentUser() async {
     if (_auth.currentUser != null) {
       String userId = _auth.currentUser!.uid;
 
@@ -121,38 +123,40 @@ class FirebaseService extends ChangeNotifier {
       if (personalInfo['Age'] == null ||
           (personalInfo["SecurityQuestionAnswer"] == null ||
               personalInfo['SecurityQuestion'] == null)) {
-        final chodiUser = ChodiUser.User(
+        final chodiuser = chodiUser(
           email: personalInfo["Email"],
           username: personalInfo["Username"],
           age: '',
           securityQuestion: '',
           securityQuestionAnswer: '',
-          registeredFor: {},
+          registeredFor: personalInfo["registeredFor"],
+          lastUpdated: personalInfo["lastUpdated"],
         );
-        return chodiUser;
+        return chodiuser;
       } else {
-        final chodiUser = ChodiUser.User(
+        final chodiuser = chodiUser(
           email: personalInfo["Email"],
           username: personalInfo["Username"],
           age: personalInfo['Age'],
           securityQuestionAnswer: personalInfo["SecurityQuestionAnswer"],
           securityQuestion: personalInfo["SecurityQuestion"],
-          registeredFor: {},
+          registeredFor: personalInfo["registeredFor"],
+          lastUpdated: personalInfo["lastUpdated"],
         );
-        return chodiUser;
+        return chodiuser;
       }
     }
     return null;
   }
 
   Future<String> getUsername() async {
-    ChodiUser.User? user = await getDataOfCurrentUser();
+    chodiUser? user = await getDataOfCurrentUser();
     String username = user!.username;
     return username;
   }
 
   //User is not currently logged in but needs information based on the email
-  Future<ChodiUser.User?> getDataOfUserGivenEmail(String email) async {
+  Future<chodiUser?> getDataOfUserGivenEmail(String email) async {
     if (await checkIfEmailExistsInFirebase(email)) {
       CollectionReference securityQuestionData =
           FirebaseFirestore.instance.collection("EndUsers");
@@ -172,15 +176,15 @@ class FirebaseService extends ChangeNotifier {
           for (var pIndex = 0; pIndex < list.length; pIndex++) {
             //if email used is not google-authenticated
             if (list[pIndex] != 'google.com') {
-              final chodiUser = ChodiUser.User(
-                email: allData[i]["Email"],
-                username: allData[i]["Username"],
-                age: allData[i]['Age'],
-                securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
-                securityQuestion: allData[i]["SecurityQuestion"],
-                registeredFor: {},
-              );
-              return chodiUser;
+              final chodiuser = chodiUser(
+                  email: allData[i]["Email"],
+                  username: allData[i]["Username"],
+                  age: allData[i]['Age'],
+                  securityQuestionAnswer: allData[i]["SecurityQuestionAnswer"],
+                  securityQuestion: allData[i]["SecurityQuestion"],
+                  registeredFor: allData[i]["registeredFor"],
+                  lastUpdated: allData[i]["lastUpdated"]);
+              return chodiuser;
             }
           }
         }
@@ -195,7 +199,7 @@ class FirebaseService extends ChangeNotifier {
   Future<Map<String, dynamic>> getSecurityQuestionAndAnswer(
       String email) async {
     if (await getDataOfUserGivenEmail(email) != null) {
-      ChodiUser.User? user = await getDataOfUserGivenEmail(email);
+      chodiUser? user = await getDataOfUserGivenEmail(email);
       String securityQuestion = user!.securityQuestion;
       String securityQuestionAnswer = user.securityQuestionAnswer;
       return {

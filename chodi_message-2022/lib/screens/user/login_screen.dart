@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/configs/app_theme.dart';
 import 'package:flutter_chodi_app/screens/home_screen.dart';
+import 'package:flutter_chodi_app/screens/impact/impact_screen.dart';
 import 'package:flutter_chodi_app/screens/user/forgot_password_email_screen.dart';
 import 'package:flutter_chodi_app/screens/user/sign_up_screen.dart';
 import 'package:flutter_chodi_app/services/firebase_authentication_service.dart';
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 //user has signed into chodi firebase
                 _showToast("success");
 
-                return HomeScreen();
+                return const HomeScreen();
               } else if (snapshot.hasError) {
                 return _showToast("Something went wrong");
               } else {

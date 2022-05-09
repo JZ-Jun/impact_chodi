@@ -1,31 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class User {
+class chodiUser {
   String email;
   String username;
   String age;
   String securityQuestion;
   String securityQuestionAnswer;
   Map<dynamic, dynamic> registeredFor;
+  Timestamp? lastUpdated;
+  String? imageURL;
 
-  User(
+  chodiUser(
       {required this.email,
       required this.username,
       required this.age,
       required this.securityQuestion,
       required this.securityQuestionAnswer,
-      required this.registeredFor});
+      required this.registeredFor,
+      this.lastUpdated,
+      this.imageURL});
 
-  factory User.fromFirestore(QueryDocumentSnapshot fbData) {
+  factory chodiUser.fromFirestore(QueryDocumentSnapshot fbData) {
     Map data = fbData.data() as Map;
 
-    return User(
-      email: data['Email'],
-      username: data["Username"],
-      age: data["Age"],
-      securityQuestion: data["SecurityQuestion"],
-      securityQuestionAnswer: data["SecurityQuestionAnswer"],
-      registeredFor: data["registeredFor"] ?? {},
-    );
+    return chodiUser(
+        email: data['Email'] ?? '',
+        username: data["Username"] ?? '',
+        age: data["Age"] ?? '',
+        securityQuestion: data["SecurityQuestion"] ?? '',
+        securityQuestionAnswer: data["SecurityQuestionAnswer"] ?? '',
+        registeredFor: data["registeredFor"] ?? {},
+        lastUpdated: data["LastUpdated"],
+        imageURL: data["imageURL"] ?? "");
   }
 }

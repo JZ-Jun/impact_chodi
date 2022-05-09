@@ -22,7 +22,8 @@ class ForgotSecurityQuestionScreen extends StatefulWidget {
 
 class _ForgotSecurityQuestionScreenState
     extends State<ForgotSecurityQuestionScreen> {
-  late User? user = ModalRoute.of(context)?.settings.arguments as User?;
+  late chodiUser? user =
+      ModalRoute.of(context)?.settings.arguments as chodiUser?;
   late TextEditingController securityQuestionController;
   late TextEditingController securityQuestionAnswerController;
   FirebaseService fbservice = FirebaseService();

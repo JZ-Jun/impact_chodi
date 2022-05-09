@@ -17,7 +17,7 @@ class ForgotPasswordEmailScreen extends StatefulWidget {
 class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
   FirebaseService fbservice = FirebaseService();
   late TextEditingController emailController;
-  late User user;
+  late chodiUser user;
 
   @override
   void initState() {
@@ -36,114 +36,120 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
             bottom: MediaQuery.of(context).padding.bottom + 16),
         decoration:
             const BoxDecoration(gradient: AppTheme.containerLinearGradient),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-                onPressed: () {
-                  Navigator.pop(
-                    context,
-                  );
-                },
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  size: 20,
-                  color: Colors.white,
-                )),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.03,
-                  left: 20,
-                  right: 20),
-              child: const StripGuide(index: 0),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                      left: 20, top: MediaQuery.of(context).size.height) *
-                  0.035,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Forgot",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 39,
-                        decoration: TextDecoration.none),
-                  ),
-                  Text(
-                    "password?",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 39,
-                        decoration: TextDecoration.none),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                  bottom: 20,
-                  top: MediaQuery.of(context).size.height * 0.11,
-                  left: 26),
-              child: const Text(
-                "Email",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-            ),
-            Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.only(left: 16),
-                height: 38,
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                width: MediaQuery.of(context).size.width,
-                child: TextField(
-                  style: const TextStyle(color: AppTheme.fontColor),
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 3),
-                      hintText: 'Enter your email',
-                      isDense: true,
-                      border: InputBorder.none),
-                )),
-            Expanded(
-                child: Center(
-              child: GestureDetector(
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      left: 30, right: 30, top: 10, bottom: 10),
-                  margin: const EdgeInsets.only(top: 47),
-                  decoration: const BoxDecoration(
-                      color: Color(0xFF76D6E1),
-                      borderRadius: BorderRadius.all(Radius.circular(18))),
-                  child: const Text(
-                    "Next",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                    onPressed: () {
+                      Navigator.pop(
+                        context,
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      size: 20,
+                      color: Colors.white,
+                    )),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.03,
+                      left: 20,
+                      right: 20),
+                  child: const StripGuide(index: 0),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                          left: 20, top: MediaQuery.of(context).size.height) *
+                      0.035,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "Forgot",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 39,
+                            decoration: TextDecoration.none),
+                      ),
+                      Text(
+                        "password?",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 39,
+                            decoration: TextDecoration.none),
+                      )
+                    ],
                   ),
                 ),
-                onTap: () async {
-                  if (_validateEmail() &&
-                      await fbservice
-                          .checkIfEmailExistsInFirebase(emailController.text)) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ForgotSecurityQuestionScreen(
-                                email: emailController.text)));
-                  } else {
-                    _showToast("Invalid email");
-                  }
-                },
-              ),
-            ))
-          ],
+                Padding(
+                  padding: EdgeInsets.only(
+                      bottom: 20,
+                      top: MediaQuery.of(context).size.height * 0.11,
+                      left: 26),
+                  child: const Text(
+                    "Email",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+                Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.only(left: 16),
+                    height: 38,
+                    decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(20))),
+                    width: MediaQuery.of(context).size.width,
+                    child: TextField(
+                      style: const TextStyle(color: AppTheme.fontColor),
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.only(left: 3),
+                          hintText: 'Enter your email',
+                          isDense: true,
+                          border: InputBorder.none),
+                    )),
+                Expanded(
+                    child: Center(
+                  child: GestureDetector(
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                          left: 30, right: 30, top: 10, bottom: 10),
+                      margin: const EdgeInsets.only(top: 47),
+                      decoration: const BoxDecoration(
+                          color: Color(0xFF76D6E1),
+                          borderRadius: BorderRadius.all(Radius.circular(18))),
+                      child: const Text(
+                        "Next",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                    ),
+                    onTap: () async {
+                      if (_validateEmail() &&
+                          await fbservice.checkIfEmailExistsInFirebase(
+                              emailController.text)) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ForgotSecurityQuestionScreen(
+                                        email: emailController.text)));
+                      } else {
+                        _showToast("Invalid email");
+                      }
+                    },
+                  ),
+                ))
+              ],
+            ),
+          ),
         ),
       ),
     );

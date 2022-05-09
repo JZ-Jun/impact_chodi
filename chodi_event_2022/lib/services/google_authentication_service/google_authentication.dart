@@ -106,16 +106,18 @@ class GoogleAuthentication extends ChangeNotifier {
 
         "Email": user.email,
         "Username": user.displayName,
-        "Age": null,
-        "SecurityQuestion": null,
-        "SecurityQuestionAnswer": null,
+        "Age": '',
+        "SecurityQuestion": '',
+        "SecurityQuestionAnswer": '',
+        "lastUpdated": Timestamp.now(),
+        "imageURL": '',
 
         //after logging, redirect to another page, (use if condition to decide) then update the values.
         //Delete account if incompleted.
-      });
-
-      await favorites.doc(user.uid).set({
-        "Favorite Organizations": [],
+      }).then((res) async {
+        await favorites.doc(user.uid).set({
+          "Favorite Organizations": [],
+        });
       });
     }
   }
