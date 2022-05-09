@@ -117,6 +117,7 @@ class GoogleAuthentication extends ChangeNotifier {
       }).then((res) async {
         await favorites.doc(user.uid).set({
           "Favorite Organizations": [],
+          "Favorite Events": {},
         });
       });
     }

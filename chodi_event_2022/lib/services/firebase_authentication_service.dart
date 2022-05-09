@@ -43,6 +43,7 @@ class FirebaseService extends ChangeNotifier {
                                   .doc(credential.user!.uid)
                                   .set({
                                 "Favorite Organizations": [],
+                                "Favorite Events": {},
                               })
                             })
                   }

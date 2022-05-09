@@ -62,147 +62,155 @@ class _ForgotSecurityQuestionScreenState
                     bottom: MediaQuery.of(context).padding.bottom + 16),
                 decoration: const BoxDecoration(
                     gradient: AppTheme.containerLinearGradient),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(
-                            context,
-                          );
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          size: 20,
-                          color: Colors.white,
-                        )),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.035,
-                          left: 20,
-                          right: 20),
-                      child: const StripGuide(index: 1),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(
+                                context,
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios,
+                              size: 20,
+                              color: Colors.white,
+                            )),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height * 0.035,
                               left: 20,
-                              top: MediaQuery.of(context).size.height) *
-                          0.035,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "Forgot",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 39,
-                                decoration: TextDecoration.none),
-                          ),
-                          Text(
-                            "password?",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 39,
-                                decoration: TextDecoration.none),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          bottom: 16,
-                          top: MediaQuery.of(context).size.height * 0.1,
-                          left: 26),
-                      child: const Text(
-                        "Security Question",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                    Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.only(left: 16),
-                        height: 38,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        width: MediaQuery.of(context).size.width,
-                        child: TextField(
-                          style: const TextStyle(color: AppTheme.fontColor),
-                          controller: securityQuestionController,
-                          enabled: false,
-                          decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.only(left: 3),
-                              isDense: true,
-                              hintText: snapshot.data!["securityQuestion"],
-                              border: InputBorder.none),
-                        )),
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 16, top: 16, left: 26),
-                      child: Text(
-                        "Answer",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                    Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.only(left: 16),
-                        height: 38,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        width: MediaQuery.of(context).size.width,
-                        child: TextField(
-                          style: const TextStyle(color: AppTheme.fontColor),
-                          controller: securityQuestionAnswerController,
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 3),
-                              isDense: true,
-                              hintText: "Input your answer",
-                              border: InputBorder.none),
-                        )),
-                    Expanded(
-                        child: Center(
-                      child: GestureDetector(
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                              left: 30, right: 30, top: 10, bottom: 10),
-                          margin: const EdgeInsets.only(top: 47),
-                          decoration: const BoxDecoration(
-                              color: Color(0xFF76D6E1),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(18))),
-                          child: const Text(
-                            "Next",
-                            style: TextStyle(fontSize: 20, color: Colors.white),
+                              right: 20),
+                          child: const StripGuide(index: 1),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                                  left: 20,
+                                  top: MediaQuery.of(context).size.height) *
+                              0.035,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                "Forgot",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 39,
+                                    decoration: TextDecoration.none),
+                              ),
+                              Text(
+                                "password?",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 39,
+                                    decoration: TextDecoration.none),
+                              )
+                            ],
                           ),
                         ),
-                        onTap: () {
-                          if (snapshot.data!["securityQuestionAnswer"] ==
-                              securityQuestionAnswerController.text) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ResetPasswordScreen(email: widget.email),
-                                  settings: RouteSettings(arguments: user)),
-                            );
-                          } else {
-                            _showToast("error");
-                          }
-                        },
-                      ),
-                    ))
-                  ],
+                        Padding(
+                          padding: EdgeInsets.only(
+                              bottom: 16,
+                              top: MediaQuery.of(context).size.height * 0.1,
+                              left: 26),
+                          child: const Text(
+                            "Security Question",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                        Container(
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.only(left: 16),
+                            height: 38,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            width: MediaQuery.of(context).size.width,
+                            child: TextField(
+                              style: const TextStyle(color: AppTheme.fontColor),
+                              controller: securityQuestionController,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 3),
+                                  isDense: true,
+                                  hintText: snapshot.data!["securityQuestion"],
+                                  border: InputBorder.none),
+                            )),
+                        const Padding(
+                          padding:
+                              EdgeInsets.only(bottom: 16, top: 16, left: 26),
+                          child: Text(
+                            "Answer",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                        Container(
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.only(left: 16),
+                            height: 38,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            width: MediaQuery.of(context).size.width,
+                            child: TextField(
+                              style: const TextStyle(color: AppTheme.fontColor),
+                              controller: securityQuestionAnswerController,
+                              decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 3),
+                                  isDense: true,
+                                  hintText: "Input your answer",
+                                  border: InputBorder.none),
+                            )),
+                        Expanded(
+                            child: Center(
+                          child: GestureDetector(
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 30, right: 30, top: 10, bottom: 10),
+                              margin: const EdgeInsets.only(top: 47),
+                              decoration: const BoxDecoration(
+                                  color: Color(0xFF76D6E1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(18))),
+                              child: const Text(
+                                "Next",
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              ),
+                            ),
+                            onTap: () {
+                              if (snapshot.data!["securityQuestionAnswer"] ==
+                                  securityQuestionAnswerController.text) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ResetPasswordScreen(
+                                          email: widget.email),
+                                      settings: RouteSettings(arguments: user)),
+                                );
+                              } else {
+                                _showToast("error");
+                              }
+                            },
+                          ),
+                        ))
+                      ],
+                    ),
+                  ),
                 ),
               ),
             );
