@@ -19,31 +19,40 @@ class my_events_screenState extends State<my_events_screen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Registered Events'),
-        centerTitle: true,
-        backgroundColor: Colors.grey.shade400,
-        elevation: 0,
-      ),
-      body: Container(
-        margin: EdgeInsets.only(left: 15, right: 15, top: 20),
-        child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //横轴元素个数
-                crossAxisCount: 2,
-                //纵轴间距
-                mainAxisSpacing: 20.0,
-                //横轴间距
-                crossAxisSpacing: 20.0,
-                //子组件宽高长度比例
-                childAspectRatio: 0.8),
-            itemBuilder: (context, index) {
-              return buildItem();
-            },
-            itemCount: 1),
-      ),
-    );
+    return StreamBuilder(
+        stream: null,
+        builder: (context, AsyncSnapshot snapshot) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Registered Events'),
+              centerTitle: true,
+              backgroundColor: Colors.grey.shade400,
+              elevation: 0,
+            ),
+            body: SingleChildScrollView(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: Container(
+                  margin: const EdgeInsets.only(left: 15, right: 15, top: 20),
+                  child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          //横轴元素个数
+                          crossAxisCount: 2,
+                          //纵轴间距
+                          mainAxisSpacing: 20.0,
+                          //横轴间距
+                          crossAxisSpacing: 20.0,
+                          //子组件宽高长度比例
+                          childAspectRatio: 0.8),
+                      itemBuilder: (context, index) {
+                        return buildItem();
+                      },
+                      itemCount: 20),
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   buildItem() {

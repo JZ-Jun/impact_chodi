@@ -24,7 +24,7 @@ class my_favorite_screenState extends State<my_favorite_screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My favorite'),
+        title: const Text('Favorite Communities'),
         centerTitle: true,
         backgroundColor: Colors.grey.shade400,
         elevation: 0,

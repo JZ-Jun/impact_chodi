@@ -19,7 +19,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   late TextEditingController confirmPasswordController;
   //SqliteService sqliteService = SqliteService.instance;
   FirebaseService fbservice = FirebaseService();
-  late User? user = ModalRoute.of(context)?.settings.arguments as User?;
+  late chodiUser? user =
+      ModalRoute.of(context)?.settings.arguments as chodiUser?;
 
   @override
   void initState() {
