@@ -18,12 +18,14 @@ class edit_profile_screen extends StatefulWidget {
   String savedProfileImageURL;
   String username;
   String agegroup;
+  String gender;
 
   edit_profile_screen(
       {Key? key,
       required this.savedProfileImageURL,
       required this.username,
-      required this.agegroup})
+      required this.agegroup,
+      required this.gender})
       : super(key: key);
 
   @override
@@ -36,6 +38,7 @@ class edit_profile_screen extends StatefulWidget {
 class edit_profile_screenState extends State<edit_profile_screen> {
   // ignore: prefer_typing_uninitialized_variables
   var ageValue;
+  var genderValue;
   List<String> ageList = [
     '12 or under',
     '13-17',
@@ -47,6 +50,15 @@ class edit_profile_screenState extends State<edit_profile_screen> {
     '65 and over',
     'Prefer not to say'
   ];
+  List<String> genderList = [
+    'Female',
+    'Male',
+    'Non-binary',
+    'Transgender',
+    'Intersex',
+    'Other',
+    'Prefer Not To Say'
+  ];
   final FirebaseAuth _user = FirebaseAuth.instance;
   final ImagePicker _picker = ImagePicker();
   Storage fbstorage = Storage();
@@ -54,9 +66,10 @@ class edit_profile_screenState extends State<edit_profile_screen> {
   late XFile pickedImage;
   late TextEditingController nameController;
 
-  DropdownMenuItem<String> buildMenuItem(String ageValue) => DropdownMenuItem(
-      value: ageValue,
-      child: Text(ageValue, style: const TextStyle(color: AppTheme.fontColor)));
+  DropdownMenuItem<String> buildMenuItem(String menuValue) => DropdownMenuItem(
+      value: menuValue,
+      child:
+          Text(menuValue, style: const TextStyle(color: AppTheme.fontColor)));
 
   @override
   void initState() {
@@ -123,6 +136,7 @@ class edit_profile_screenState extends State<edit_profile_screen> {
       "Age": ageValue,
       "Username": nameController.text,
       "lastUpdated": Timestamp.now(),
+      "Gender": genderValue,
     });
   }
 
@@ -175,8 +189,8 @@ class edit_profile_screenState extends State<edit_profile_screen> {
               ));
         }).then((value) {
       if (value == 0) {
-        _takePhoto();
-        /*
+        //_takePhoto();
+
         _takePhoto().then((photo) => {
               fbstorage.uploadImageToStorage(photo).then((downloadURL) => {
                     fbstorage
@@ -184,11 +198,10 @@ class edit_profile_screenState extends State<edit_profile_screen> {
                         .then((res) => {log("PHOTO WORKED")})
                   })
             });
-            */
       } else if (value == 1) {}
 
-      _getGallery();
-      /*
+      //_getGallery();
+
       _getGallery().then((photo) => {
             fbstorage.uploadImageToStorage(photo).then((downloadURL) => {
                   fbstorage
@@ -196,7 +209,6 @@ class edit_profile_screenState extends State<edit_profile_screen> {
                       .then((res) => {log("GALLERY WORKED")})
                 })
           });
-          */
     });
   }
 
@@ -294,11 +306,25 @@ class edit_profile_screenState extends State<edit_profile_screen> {
                       borderRadius:
                           const BorderRadius.all(Radius.circular(20))),
                   child: Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.only(left: 16),
-                    height: 38,
-                    width: MediaQuery.of(context).size.width,
-                  ),
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      height: 38,
+                      width: MediaQuery.of(context).size.width / 2.5,
+                      child: DropdownButton<String>(
+                          alignment: Alignment.center,
+                          isExpanded: true,
+                          hint: widget.gender != ''
+                              ? Text(widget.gender)
+                              : const Text("..."),
+                          dropdownColor: Colors.white,
+                          underline: const SizedBox(),
+                          icon: const Icon(Icons.arrow_drop_down),
+                          items: genderList.map(buildMenuItem).toList(),
+                          value: genderValue,
+                          onChanged: (newValue) {
+                            setState(() {
+                              genderValue = newValue!;
+                            });
+                          })),
                 ),
               ],
             ),
@@ -339,27 +365,6 @@ class edit_profile_screenState extends State<edit_profile_screen> {
               ],
             ),
             const SizedBox(height: 30),
-            Row(
-              children: [
-                const SizedBox(width: 30),
-                const SizedBox(width: 100, child: Text('Location')),
-                const SizedBox(width: 10),
-                Container(
-                  width: 200,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20))),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.only(left: 16),
-                    height: 38,
-                    width: MediaQuery.of(context).size.width,
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 50),
             TextButton(
               onPressed: () {
