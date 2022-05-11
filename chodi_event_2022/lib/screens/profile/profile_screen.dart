@@ -99,35 +99,34 @@ class profile_screenState extends State<profile_screen> {
                       'Edit Profile',
                       snapshot.data["imageURL"],
                       snapshot.data["Username"] ?? '',
-                      snapshot.data["Age"] ?? ''),
+                      snapshot.data["Age"] ?? '',
+                      ''),
+                  const SizedBox(height: 15),
+                  buildItem(1, Icons.calendar_month, 'Registered Events', '',
+                      '', '', ''),
                   const SizedBox(height: 15),
                   buildItem(
-                      1, Icons.calendar_month, 'Registered Events', '', '', ''),
+                      2, Icons.people, 'Favorite Communities', '', '', '', ''),
                   const SizedBox(height: 15),
-                  buildItem(
-                      2, Icons.people, 'Favorite Communities', '', '', ''),
-                  const SizedBox(height: 15),
-                  buildItem(3, Icons.settings, 'Settings', '', '', ''),
+                  buildItem(3, Icons.settings, 'Settings', '', '', '', ''),
                   const SizedBox(height: 20),
                   Container(height: 1, color: Colors.grey.shade200),
                   const SizedBox(height: 20),
                   Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      const Icon(Icons.phone, size: 30),
-                      const SizedBox(width: 40),
-                      _user.currentUser!.phoneNumber != null
-                          ? Text(_user.currentUser!.phoneNumber.toString())
-                          : const Text(""),
+                    children: const [
+                      SizedBox(width: 10),
+                      Icon(Icons.phone, size: 30),
+                      SizedBox(width: 40),
+                      Text("+1 (239) 876-554"),
                     ],
                   ),
                   const SizedBox(height: 15),
                   Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      const Icon(Icons.email, size: 30),
-                      const SizedBox(width: 40),
-                      Text(_user.currentUser!.email.toString()),
+                    children: const [
+                      SizedBox(width: 10),
+                      Icon(Icons.email, size: 30),
+                      SizedBox(width: 40),
+                      Text("191abChoDi@gmail.com"),
                     ],
                   )
                 ],
@@ -138,7 +137,7 @@ class profile_screenState extends State<profile_screen> {
   }
 
   buildItem(int index, IconData? icon, String txt, String imageURL,
-      String username, String age_group) {
+      String username, String age_group, String gender) {
     return GestureDetector(
         onTap: () {
           switch (index) {
@@ -148,6 +147,7 @@ class profile_screenState extends State<profile_screen> {
                   savedProfileImageURL: imageURL,
                   username: username,
                   agegroup: age_group,
+                  gender: gender,
                 );
               }));
               break;

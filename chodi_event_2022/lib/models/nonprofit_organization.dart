@@ -52,9 +52,8 @@ class NonProfitOrg {
   }
 
   returnName() {
-    return name ;
+    return name;
   }
-
 
   factory NonProfitOrg.fromFirestore(QueryDocumentSnapshot fbData) {
     Map data = fbData.data() as Map;
@@ -81,41 +80,65 @@ class NonProfitOrg {
       orgSize: data['Org Size'] ?? 0,
     );
   }
+
+  Map toJson() {
+    return {
+      'ein': ein,
+      'name': name,
+      'category': category,
+      'cause': cause,
+      'city': city,
+      'state': state,
+      'website': website,
+      'financials': financials,
+      'address': address,
+      'contactEmail': contactEmail,
+      'contactFirstName': contactFirstName,
+      'contactLastName': contactLastName,
+      'contactNumber': contactNumber,
+      'vision': vision,
+      'imageURL': imageURL,
+      'impactImageURL': impactImageURL,
+      'founded': founded,
+      'zip': zip,
+      'orgSize': orgSize
+    };
+  }
 }
 
 Future<List<NonProfitOrg>> getAllNonprofits() async {
-  QuerySnapshot ngoList = 
+  QuerySnapshot ngoList =
       await FirebaseFirestore.instance.collection("Nonprofits").get();
 
-  return ngoList.docs.map(
-      (data) => NonProfitOrg(
-        ein: data['EIN'] ?? '',
-        name: data['Name'] ?? '',
-        category: data['Category'] ?? '',
-        cause: data['Cause'] ?? '',
-        city: data['City'] ?? '',
-        state: data['State'] ?? '',
-        website: data['Website'] ?? '',
-        financials: data['Financials'] ?? '',
-        address: data['Address'] ?? '',
-        contactEmail: data['Contact Email'] ?? '',
-        contactFirstName: data['Contact First Name'] ?? '',
-        contactLastName: data['Contact Last Name'] ?? '',
-        contactNumber: data['Contact Number'] ?? '',
-        vision: data['Mission/Vision'] ?? '',
-        imageURL: data['imageURL'] ?? '',
-        impactImageURL: data['impactImageURL'] ?? '',
-        founded: data['Founded'] ?? 0,
-        zip: data['Zip'] ?? 0,
-        orgSize: data['Org Size'] ?? 0,
-      )
-  ).toList() ;
+  return ngoList.docs
+      .map((data) => NonProfitOrg(
+            ein: data['EIN'] ?? '',
+            name: data['Name'] ?? '',
+            category: data['Category'] ?? '',
+            cause: data['Cause'] ?? '',
+            city: data['City'] ?? '',
+            state: data['State'] ?? '',
+            website: data['Website'] ?? '',
+            financials: data['Financials'] ?? '',
+            address: data['Address'] ?? '',
+            contactEmail: data['Contact Email'] ?? '',
+            contactFirstName: data['Contact First Name'] ?? '',
+            contactLastName: data['Contact Last Name'] ?? '',
+            contactNumber: data['Contact Number'] ?? '',
+            vision: data['Mission/Vision'] ?? '',
+            imageURL: data['imageURL'] ?? '',
+            impactImageURL: data['impactImageURL'] ?? '',
+            founded: data['Founded'] ?? 0,
+            zip: data['Zip'] ?? 0,
+            orgSize: data['Org Size'] ?? 0,
+          ))
+      .toList();
 }
 
 NonProfitOrg getNonProfit(List<NonProfitOrg> list, String EIN) {
-  for (int i = 0 ; i < list.length ; i++){
+  for (int i = 0; i < list.length; i++) {
     if (list[i].ein == EIN) {
-      return list[i] ;
+      return list[i];
     }
   }
   throw UnimplementedError();
