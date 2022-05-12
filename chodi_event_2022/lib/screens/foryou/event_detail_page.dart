@@ -57,7 +57,7 @@ class event_detail_page_state extends State<event_detail_page> {
   String? endTime;
 
   late String textbody =
-      "${widget.ngoName}\n${widget.ngoEvent.name}\n\n${widget.ngoEvent.description}\n\n$startDate $startTime\nto\n$endDate $endTime\n\n'${widget.ngoEvent.address}\n${widget.ngoEvent.city}, ${widget.ngoEvent.state} ${widget.ngoEvent.zip} ${widget.ngoEvent.country}\n\n${widget.ngoEvent.notes}\n\nSent from the Chodi App ";
+      "${widget.ngoName}\n${widget.ngoEvent.name}\n\n${widget.ngoEvent.description}\n\n$startDate $startTime\nto\n$endDate $endTime\n\n'${widget.ngoEvent.address}\n${widget.ngoEvent.city}, ${widget.ngoEvent.state} ${widget.ngoEvent.zip} ${widget.ngoEvent.country}\n\n${widget.ngoEvent.locationHelp}\n\nSent from the Chodi App ";
 
   @override
   void initState() {
@@ -71,7 +71,7 @@ class event_detail_page_state extends State<event_detail_page> {
         .doc(_auth.currentUser!.uid)
         .snapshots();
 
-    availableSpace = widget.ngoEvent.availableSpace;
+    availableSpace = widget.ngoEvent.returnAvailableSpace();
 
     if (availableSpace > widget.ngoEvent.totalSpace) {
       availableSpace = widget.ngoEvent.totalSpace;
@@ -140,7 +140,7 @@ class event_detail_page_state extends State<event_detail_page> {
                             width: 100,
                             height: 100,
                             fit: BoxFit.fill,
-                            imageUrl: widget.ngoEvent.imageURL!,
+                            imageUrl: widget.ngoEvent.imageURL,
                             placeholder: (context, url) =>
                                 const CircularProgressIndicator(),
                             errorWidget: (context, url, error) =>
@@ -234,9 +234,9 @@ class event_detail_page_state extends State<event_detail_page> {
                                                         content: availableSpace >
                                                                 1
                                                             ? Text(
-                                                                'There are ${widget.ngoEvent.availableSpace} spaces available.\nWould you like to register?')
+                                                                'There are ${widget.ngoEvent.returnAvailableSpace()} spaces available.\nWould you like to register?')
                                                             : Text(
-                                                                'There is ${widget.ngoEvent.availableSpace} space available.\nWould you like to register?'),
+                                                                'There is ${widget.ngoEvent.returnAvailableSpace()} space available.\nWould you like to register?'),
                                                         actions: [
                                                           GestureDetector(
                                                             onTap: () =>
@@ -356,7 +356,7 @@ class event_detail_page_state extends State<event_detail_page> {
                     const SizedBox(height: 10),
                     const Text('Description', style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 20),
-                    Text(widget.ngoEvent.description!,
+                    Text(widget.ngoEvent.description,
                         maxLines: descTextShowFlag ? 200 : 5,
                         textAlign: TextAlign.start),
                     InkWell(
@@ -395,7 +395,7 @@ class event_detail_page_state extends State<event_detail_page> {
                     const SizedBox(height: 30),
                     const Text('Notes', style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 10),
-                    Text(widget.ngoEvent.notes!,
+                    Text(widget.ngoEvent.locationHelp,
                         maxLines: descTextShowFlag2 ? 200 : 5,
                         textAlign: TextAlign.start),
                     InkWell(
@@ -407,7 +407,7 @@ class event_detail_page_state extends State<event_detail_page> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          widget.ngoEvent.notes != ''
+                          widget.ngoEvent.locationHelp != ''
                               ? descTextShowFlag2
                                   ? const Text(
                                       "Show Less",

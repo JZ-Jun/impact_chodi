@@ -54,7 +54,7 @@ class NonProfitOrg {
   returnName() {
     return name;
   }
-
+  
   factory NonProfitOrg.fromFirestore(QueryDocumentSnapshot fbData) {
     Map data = fbData.data() as Map;
 

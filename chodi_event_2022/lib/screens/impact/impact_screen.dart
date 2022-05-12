@@ -21,6 +21,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../widget/clock/analog_clock.dart';
 
+
+//THIS IS NOT AN IDEAL SOLUTION, BUT IS THE ONLY WAY TO MAKE EVENT SCREEN WORK RIGHT NOW
+//TO GET RID OF THIS SHITTY CONST (Since it makes the list of events only successfully refresh whenever user
+//touches the impact screen), CHANGE CALENDER SCREEN TO BE A STREAM/FUTURE BUILDER AND PULL THIS DATA DIRECTLY
+List<NonProfitOrg> NGOList = [];
+
 /*FirebaseService fbservice = FirebaseService();
 Storage storage = Storage();
 late Future recentHistoryData;
@@ -116,10 +122,10 @@ List<Widget> _createOrganizationWidget(
     if (impacts.isEmpty) {
       avatars.add(const Text(''));
     } else {
-      print(impacts);
+      //print(impacts);
       for (var i = 0; i < impacts.length; i++) {
         if (i < 4) {
-          print(NGOs);
+          //print(NGOs);
           avatars.add(ProfileAvatar(assetURL: NGOs[i].returnImpactImageURL()));
         } else {
           break;
@@ -210,7 +216,6 @@ class _ImpactScreenState extends State<ImpactScreen>
 
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-    print(uid);
 
     //Grab the user information
     impactList = FirebaseFirestore.instance
@@ -223,20 +228,6 @@ class _ImpactScreenState extends State<ImpactScreen>
 
     allNGOs = FirebaseFirestore.instance.collection("Nonprofits").snapshots();
 
-    /*recentHistoryData = _getRecentHistoryDataImpact(10); //START AT 10
-
-    supportedOrganizationsData = _getSupportedOrganizations();
-    organizationImageURLs = _getSupportedOrganizations('assetURL');*/
-
-/*    allData = Future.wait(
-      [
-        recentHistoryData,
-        supportedOrganizationsData,
-        organizationImageURLs,
-        //_getTotalParticipatedEvents(),
-        //_getOrganizationWidget(context),
-      ],
-    );*/
 
     controller = AnimationController(
       duration: const Duration(milliseconds: 1300),
@@ -251,7 +242,6 @@ class _ImpactScreenState extends State<ImpactScreen>
 
   //stores data for each impact event the user has participated in
   List<Impact> Impacts = [];
-  List<NonProfitOrg> NGOList = [];
   num totalDonations = 0;
   int totalHours = 0;
   int eventsJoined = 0;
@@ -274,9 +264,7 @@ class _ImpactScreenState extends State<ImpactScreen>
 
             //add the impact events to a list we can more easily manipulate
             for (var i in snapshot.data!.docs) {
-              //print(snapshot.data!.docs) ;
               Impacts.add(Impact.fromFirestore(i));
-              //print(Impacts) ;
             }
 
             //figure out how many dollarydoos the user has donated
@@ -303,6 +291,7 @@ class _ImpactScreenState extends State<ImpactScreen>
                     return Container();
                   } else if (snapshot.hasData) {
                     NGOList.clear();
+
 
                     for (var i in snapshot.data!.docs) {
                       NGOList.add(NonProfitOrg.fromFirestore(i));
