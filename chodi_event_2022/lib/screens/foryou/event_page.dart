@@ -65,7 +65,6 @@ class event_page_state extends State<event_page> {
     DateTime dt2 = DateTime.parse(startTime.toDate().toIso8601String());
 
     Duration diff = dt2.difference(dt1);
-
     int days = diff.inDays;
 
     if (days > 1) {
@@ -100,10 +99,18 @@ class event_page_state extends State<event_page> {
 
   @override
   void initState() {
+    /*
     dataList = FirebaseFirestore.instance
         .collection("Nonprofits/" + widget.ngoInfo.ein + "/Events")
         .orderBy("endTime", descending: true)
         .where("endTime", isGreaterThanOrEqualTo: DateTime.now())
+        .snapshots();
+        */
+
+    dataList = FirebaseFirestore.instance
+        .collection("Events (User)")
+        .where('EIN', isEqualTo: widget.ngoInfo.ein)
+        //.where("endTime", isGreaterThanOrEqualTo: DateTime.now())
         .snapshots();
 
     favoriteList = FirebaseFirestore.instance
@@ -300,10 +307,19 @@ class event_page_state extends State<event_page> {
                                     //add to firebase
                                     fbservice.addUserFavoriteEvent(
                                         widget.ngoInfo.ein, event.eventID);
+
+                                    //add to EndUsers subcollection
+                                    fbservice.addUserFavoriteEventSubcollection(
+                                        widget.ngoInfo.ein, event.eventID);
                                   } else {
                                     //remove from firebase
                                     fbservice
                                         .removeUserFavoriteEvent(event.eventID);
+
+                                    //add to EndUsesr subcollection
+                                    fbservice
+                                        .removeUserFavoriteEventSubcollection(
+                                            event.eventID);
                                   }
                                 });
                               },

@@ -331,9 +331,18 @@ class event_detail_page_state extends State<event_detail_page> {
                                             fbservice.addUserFavoriteEvent(
                                                 widget.ngoEIN,
                                                 widget.ngoEvent.eventID);
+                                            //add to EndUsers subcollection
+                                            fbservice
+                                                .addUserFavoriteEventSubcollection(
+                                                    widget.ngoEIN,
+                                                    widget.ngoEvent.eventID);
                                           } else {
                                             fbservice.removeUserFavoriteEvent(
                                                 widget.ngoEvent.eventID);
+                                            //add to EndUsers subcollection
+                                            fbservice
+                                                .removeUserFavoriteEventSubcollection(
+                                                    widget.ngoEvent.eventID);
                                           }
                                         });
                                       },
@@ -390,7 +399,7 @@ class event_detail_page_state extends State<event_detail_page> {
                     const Text('Location', style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 10),
                     Text(
-                        '${widget.ngoEvent.address}\n${widget.ngoEvent.city}, ${widget.ngoEvent.state} ${widget.ngoEvent.zip} ${widget.ngoEvent.country}',
+                        '${widget.ngoEvent.address}\n${widget.ngoEvent.city}, ${widget.ngoEvent.state}\n${widget.ngoEvent.zip}\n${widget.ngoEvent.country}',
                         style: const TextStyle(fontSize: 15)),
                     const SizedBox(height: 30),
                     const Text('Notes', style: TextStyle(fontSize: 20)),

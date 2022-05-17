@@ -37,6 +37,7 @@ class FirebaseService extends ChangeNotifier {
                       "SecurityQuestionAnswer": securityQuestionAnswer,
                       "lastUpdated": Timestamp.now(),
                       "imageURL": '',
+                      "Gender": '',
                     }).then((res) async => {
                               await FirebaseFirestore.instance
                                   .collection('Favorites')
@@ -276,6 +277,21 @@ class FirebaseService extends ChangeNotifier {
     }
   }
 
+  Future addUserFavoriteOrganizationDataSubcollection(var ein) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      await favorites.doc(ein).set({
+        "EIN": ein,
+        "eventCode": '',
+        "isOrg": true,
+      });
+    }
+  }
+
   Future removeUserFavoriteOrganizationData(var ein) async {
     final user = _auth.currentUser;
 
@@ -287,6 +303,18 @@ class FirebaseService extends ChangeNotifier {
       await favorites.doc(user.uid).update({
         "Favorite Organizations": FieldValue.arrayRemove([ein]),
       });
+    }
+  }
+
+  Future removeUserFavoriteOrganizationDataSubcollection(var ein) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      //assume Favorites doc is already created
+      await favorites.doc(ein).delete();
     }
   }
 
@@ -305,6 +333,20 @@ class FirebaseService extends ChangeNotifier {
     }
   }
 
+  Future addUserFavoriteEventSubcollection(var ein, var eventCode) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      await favorites.doc(eventCode).set({
+        "EIN": ein,
+        "eventCode": eventCode,
+        "isOrg": false,
+      });
+    }
+  }
+
   Future removeUserFavoriteEvent(var eventID) async {
     final user = _auth.currentUser;
 
@@ -316,6 +358,16 @@ class FirebaseService extends ChangeNotifier {
       await favorites.doc(user.uid).update({
         'Favorite Events.$eventID': FieldValue.delete(),
       });
+    }
+  }
+
+  Future removeUserFavoriteEventSubcollection(var eventCode) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      await favorites.doc(eventCode).delete();
     }
   }
 

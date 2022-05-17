@@ -12,6 +12,7 @@ import 'package:flutter_chodi_app/screens/foryou/search_page.dart';
 import 'package:quiver/iterables.dart';
 import 'package:r_calendar/r_calendar.dart';
 
+// ignore: camel_case_types
 class my_favorite_screen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -19,12 +20,13 @@ class my_favorite_screen extends StatefulWidget {
   }
 }
 
+// ignore: camel_case_types
 class my_favorite_screenState extends State<my_favorite_screen> {
   int typeIndex = 0;
 
   late Stream userFavorites;
   final FirebaseAuth _user = FirebaseAuth.instance;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   var favOrgs = [];
   var favEvents = [];

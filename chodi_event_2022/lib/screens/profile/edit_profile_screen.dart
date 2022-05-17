@@ -38,7 +38,9 @@ class edit_profile_screen extends StatefulWidget {
 class edit_profile_screenState extends State<edit_profile_screen> {
   // ignore: prefer_typing_uninitialized_variables
   var ageValue;
+  var ageGroup;
   var genderValue;
+  var gender;
   List<String> ageList = [
     '12 or under',
     '13-17',
@@ -75,6 +77,9 @@ class edit_profile_screenState extends State<edit_profile_screen> {
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.username);
+    ageGroup = widget.agegroup;
+    gender = widget.gender;
+
     pickedImage = XFile('');
     path = widget.savedProfileImageURL;
   }
@@ -133,10 +138,10 @@ class edit_profile_screenState extends State<edit_profile_screen> {
         .collection('EndUsers')
         .doc(_user.currentUser!.uid)
         .update({
-      "Age": ageValue,
+      "Age": ageGroup,
       "Username": nameController.text,
       "lastUpdated": Timestamp.now(),
-      "Gender": genderValue,
+      "Gender": gender,
     });
   }
 
@@ -323,6 +328,7 @@ class edit_profile_screenState extends State<edit_profile_screen> {
                           onChanged: (newValue) {
                             setState(() {
                               genderValue = newValue!;
+                              gender = genderValue;
                             });
                           })),
                 ),
@@ -358,7 +364,8 @@ class edit_profile_screenState extends State<edit_profile_screen> {
                           value: ageValue,
                           onChanged: (newValue) {
                             setState(() {
-                              ageValue = newValue!;
+                              ageValue = newValue;
+                              ageGroup = ageValue;
                             });
                           })),
                 ),
