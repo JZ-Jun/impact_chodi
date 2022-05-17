@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../models/nonprofit_organization.dart';
+import '../../services/firebase_authentication_service.dart';
 import '../foryou/event_detail_page.dart';
 import '../impact/impact_screen.dart';
 import 'event_detail_page2.dart';
@@ -23,10 +26,8 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
+  FirebaseService fbservice = FirebaseService();
   int typeIndex = 0;
-  bool _isBookmark = false;
-  bool _isFavoriteExplore = false;
-  bool _isFavoriteLikes = true;
 
   late Stream<QuerySnapshot> allNGOs;
 
@@ -34,7 +35,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       .collection("EndUsers")
       .doc(FirebaseAuth.instance.currentUser?.uid)
       .collection("Favorites")
+      .where("isOrg", isEqualTo: false)
       .snapshots();
+
+  late Stream userData;
 
   String? email = FirebaseAuth.instance.currentUser?.email;
 
@@ -55,6 +59,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void initState() {
     super.initState();
+    userData = FirebaseFirestore.instance
+        .collection("EndUsers")
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .snapshots();
 
     //buildEventList(NGOList) ;
   }
@@ -231,6 +239,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             return Container();
           } else {
             eventList.clear();
+            registeredEventList.clear();
 
             //add each of these events to the eventList
             for (var i in snapshot.data!.docs) {
@@ -271,6 +280,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     for (int j = 0; j < eventList[i].attendees.length; j++) {
                       if (eventList[i].attendees.containsValue(email)) {
                         registeredEventList.add(eventList[i]);
+                        //break to prevent duplicate attendee events (according to number of attendees)
+                        // from showing up
+
+                        break;
                       }
                     }
                   }
@@ -435,88 +448,155 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   buildLikes() {
     return favoritedEventList.isNotEmpty
-        ? GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return event_detail_page(
-                  ngoEvent: favoritedEventList[0],
-                  ngoName: favoritedEventList[0].orgName,
-                  ngoEIN: favoritedEventList[0].ein,
-                );
-              }));
-            },
-            child: Container(
-                width: MediaQuery.of(context).size.width,
-                margin: const EdgeInsets.all(30),
-                padding: const EdgeInsets.only(bottom: 15),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(15),
-                        bottomRight: Radius.circular(15))),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        //Image.asset('assets/images/fy.png', width: 120),
+        ? StreamBuilder(
+            stream: userData, //to check if registered
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Container();
+              } else {
+                bool _isBookmark = false;
+                bool _isFavoriteLikes = true; //by default
 
-                        CachedNetworkImage(
-                            imageUrl: favoritedEventList[0].imageURL,
-                            width: 120),
-                        const SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                //set default state for Bookmark
+                try {
+                  var _isRegistered = snapshot.data.data()["registeredFor"]
+                      [favoritedEventList[0].eventID];
+
+                  if (_isRegistered != null) {
+                    _isBookmark = true;
+                  }
+                } catch (e) {
+                  _isBookmark = false;
+                }
+
+                return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return event_detail_page(
+                          ngoEvent: favoritedEventList[0],
+                          ngoName: favoritedEventList[0].orgName,
+                          ngoEIN: favoritedEventList[0].ein,
+                        );
+                      }));
+                    },
+                    child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.all(30),
+                        padding: const EdgeInsets.only(bottom: 15),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(15),
+                                bottomRight: Radius.circular(15))),
+                        child: Column(
                           children: [
-                            //ideally all of the [0]'s below would become [i] or some other way to iterate through the whole list
-                            Text(favoritedEventList[0].name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 5),
-                            Text(favoritedEventList[0].orgName),
-                            const SizedBox(height: 5),
-                            Text(favoritedEventList[0].locationDescription),
+                            Row(
+                              children: [
+                                //Image.asset('assets/images/fy.png', width: 120),
+
+                                CachedNetworkImage(
+                                    imageUrl: favoritedEventList[0].imageURL,
+                                    width: 120),
+                                const SizedBox(width: 20),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    //ideally all of the [0]'s below would become [i] or some other way to iterate through the whole list
+                                    Text(favoritedEventList[0].name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 5),
+                                    Text(favoritedEventList[0].orgName),
+                                    const SizedBox(height: 5),
+                                    Text(favoritedEventList[0]
+                                        .locationDescription),
+                                  ],
+                                )
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            Container(
+                                padding:
+                                    const EdgeInsets.only(left: 15, right: 15),
+                                child: Text(favoritedEventList[0].description)),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                    onTap: () {
+                                      //Check in Firebase
+                                      verifyRegistration(
+                                          _isBookmark,
+                                          favoritedEventList[0].totalSpace,
+                                          favoritedEventList[0]
+                                              .attendees
+                                              .length,
+                                          favoritedEventList[0]);
+                                    },
+                                    child: _isBookmark
+                                        ? const Icon(Icons.bookmark,
+                                            color: Colors.yellow)
+                                        : const Icon(Icons.bookmark_border)),
+                                const SizedBox(width: 10),
+                                GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        //Preferably remove it dynamically? The event cannot be removed right away
+                                        //when _isFavoriteLikes is clicked
+                                        _isFavoriteLikes = !_isFavoriteLikes;
+
+                                        if (_isFavoriteLikes) {
+                                          //add to firebase
+                                          fbservice.addUserFavoriteEvent(
+                                              favoritedEventList[0].ein,
+                                              favoritedEventList[0].eventID);
+
+                                          //add to EndUsers subcollection
+                                          fbservice
+                                              .addUserFavoriteEventSubcollection(
+                                                  favoritedEventList[0].ein,
+                                                  favoritedEventList[0]
+                                                      .eventID);
+                                        } else {
+                                          //remove from firebase
+                                          fbservice.removeUserFavoriteEvent(
+                                              favoritedEventList[0].eventID);
+
+                                          //add to EndUsesr subcollection
+                                          fbservice
+                                              .removeUserFavoriteEventSubcollection(
+                                                  favoritedEventList[0]
+                                                      .eventID);
+                                        }
+                                      });
+                                    },
+                                    child: _isFavoriteLikes
+                                        ? const Icon(Icons.favorite,
+                                            color: Colors.red)
+                                        : const Icon(Icons.favorite_border)),
+                                const SizedBox(width: 10),
+                              ],
+                            )
                           ],
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                        padding: const EdgeInsets.only(left: 15, right: 15),
-                        child: Text(favoritedEventList[0].description)),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                            onTap: () {
-                              showTipDialog();
-                              setState(() {
-                                _isBookmark = !_isBookmark;
-                              });
-                            },
-                            child: _isBookmark
-                                ? const Icon(Icons.bookmark,
-                                    color: Colors.yellow)
-                                : const Icon(Icons.bookmark_border)),
-                        const SizedBox(width: 10),
-                        GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isFavoriteLikes = !_isFavoriteLikes;
-                              });
-                            },
-                            child: _isFavoriteLikes
-                                ? const Icon(Icons.favorite, color: Colors.red)
-                                : const Icon(Icons.favorite_border)),
-                        const SizedBox(width: 10),
-                      ],
-                    )
-                  ],
-                )))
+                        )));
+              }
+            })
         : const Text("");
   }
 
   buildExplore() {
+    bool _isOwnBookmark = false;
+    bool _isFavoriteExplore = false;
+
+    //check in Firebase if it has been favorited
+    if (_isFavoriteExplore == false) {
+      _isFavoriteExplore = true;
+    }
+
     return GestureDetector(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -564,12 +644,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   const Expanded(child: SizedBox()),
                   GestureDetector(
                       onTap: () {
-                        showTipDialog();
+                        //showTipDialog(_isBookmark);
+
+                        log(_isOwnBookmark.toString());
                         setState(() {
-                          _isBookmark = !_isBookmark;
+                          _isOwnBookmark = !_isOwnBookmark;
                         });
                       },
-                      child: _isBookmark
+                      child: _isOwnBookmark
                           ? const Icon(Icons.bookmark, color: Colors.yellow)
                           : const Icon(Icons.bookmark_border)),
                   const SizedBox(width: 10),
@@ -647,10 +729,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           padding: const EdgeInsets.all(10),
           decoration:
               BoxDecoration(border: Border.all(color: Colors.grey.shade400)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Wrap(
             children: [
-              Text(registeredEventList[0].name,
+              Text("${registeredEventList[0].name}\n",
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
@@ -658,18 +739,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   .add_jm()
                   .format(registeredEventList[0].startTime.toDate().toLocal())),
               const SizedBox(height: 8),
-              Text(registeredEventList[0].locationDescription),
+              Text("${registeredEventList[0].locationDescription}\n"),
               const SizedBox(height: 15),
               Container(
                   alignment: Alignment.center,
-                  child: Image.network(registeredEventList[0].imageURL,
-                      width: 120))
+                  child: CachedNetworkImage(
+                      imageUrl: registeredEventList[0].imageURL, width: 120)),
             ],
           ),
         ));
   }
 
-  showTipDialog() {
+  /*
+  showTipDialog(bool isBookmark) {
     showDialog(
         context: context,
         builder: (context) {
@@ -696,5 +778,103 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ],
           );
         });
+  }
+*/
+
+  //check Registration
+  verifyRegistration(
+      var _isBookmark, var totalSpace, var attendeeSpace, Event ngoEvent) {
+    _isBookmark == true // Check if user has already registered for the event
+        ? showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Registration'),
+                content: const Text(
+                    'You are already registered for the event. Would you like to unregister?'),
+                actions: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context, 1),
+                    child: Container(
+                        margin: const EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.all(3),
+                        child: const Text('Yes',
+                            style: TextStyle(color: Colors.blue))),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text('Cancel',
+                            style: TextStyle(color: Colors.blue))),
+                  )
+                ],
+              );
+            }).then((value) {
+            if (value == 1) {
+              //remove from firebase
+
+              fbservice.unregisterForEvent(
+                ngoEvent.eventID,
+                ngoEvent.ein,
+              );
+              setState(() {
+                _isBookmark = false;
+              });
+            }
+          })
+        : totalSpace >
+                attendeeSpace //User is not registered and space is available
+            ? showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Registration'),
+                    content: ngoEvent.returnAvailableSpace() > 1
+                        ? Text(
+                            'There are ${ngoEvent.returnAvailableSpace()} spaces available.\nWould you like to register?')
+                        : Text(
+                            'There is ${ngoEvent.returnAvailableSpace()} space available.\nWould you like to register?'),
+                    actions: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context, 1),
+                        child: Container(
+                            margin: const EdgeInsets.only(right: 15),
+                            padding: const EdgeInsets.all(3),
+                            child: const Text('Yes',
+                                style: TextStyle(color: Colors.blue))),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Padding(
+                            padding: EdgeInsets.all(3),
+                            child: Text('Cancel',
+                                style: TextStyle(color: Colors.blue))),
+                      )
+                    ],
+                  );
+                }).then((value) {
+                if (value == 1) {
+                  //add to firebase
+
+                  fbservice.registerForEvent(
+                    ngoEvent.eventID,
+                    ngoEvent.ein,
+                  );
+                  setState(() {
+                    _isBookmark = true;
+                  });
+                }
+              })
+            : showDialog(
+                //no space is available
+                context: context,
+                builder: (context) {
+                  return const AlertDialog(
+                    title: Text('Registration'),
+                    content:
+                        Text('Sorry! There are currently no spaces available.'),
+                  );
+                });
   }
 }

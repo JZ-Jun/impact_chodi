@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -372,44 +374,44 @@ class FirebaseService extends ChangeNotifier {
   }
 
   //Registration for Event
-  Future registerForEvent(var eventID, var ngoEIN, var availableSpace) async {
+  Future registerForEvent(var eventID, var ngoEIN) async {
     final user = _auth.currentUser;
 
     if (user != null) {
       CollectionReference endUsers =
           FirebaseFirestore.instance.collection('EndUsers');
-
-      CollectionReference nonprofits = FirebaseFirestore.instance
-          .collection("Nonprofits/" + ngoEIN + "/Events");
 
       await endUsers.doc(user.uid).update({
         'registeredFor.$eventID': Timestamp.now(),
       });
 
-      await nonprofits.doc(eventID).update({
-        'Volunteers.${user.uid}': Timestamp.now(),
-        'availableSpace': availableSpace
+      CollectionReference events =
+          FirebaseFirestore.instance.collection('Events (User)');
+
+      await events.doc(eventID).update({
+        'attendees.${user.uid}': user.email,
       });
     }
   }
 
-  Future unregisterForEvent(var eventID, var ngoEIN, var availableSpace) async {
+  Future unregisterForEvent(var eventID, var ngoEIN) async {
     final user = _auth.currentUser;
 
     if (user != null) {
       CollectionReference endUsers =
           FirebaseFirestore.instance.collection('EndUsers');
-      CollectionReference nonprofits = FirebaseFirestore.instance
-          .collection("Nonprofits/" + ngoEIN + "/Events");
 
       //assume Favorites doc is already created
       await endUsers.doc(user.uid).update({
         'registeredFor.$eventID': FieldValue.delete(),
       });
 
-      await nonprofits.doc(eventID).update({
-        'Volunteers.${user.uid}': FieldValue.delete(),
-        'availableSpace': availableSpace
+      CollectionReference events =
+          FirebaseFirestore.instance.collection('Events (User)');
+
+      await events.doc(eventID).update({
+        //delete according to current user's uid
+        'attendees.${user.uid}': FieldValue.delete(),
       });
     }
   }

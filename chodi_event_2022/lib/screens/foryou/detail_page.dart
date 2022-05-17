@@ -32,24 +32,44 @@ class Detail_Page_State extends State<Detail_Page> {
   bool _isFavorite = false;
   bool descTextShowFlag = false;
 
+  late Stream favoritesStream;
+
   @override
   void initState() {
     super.initState();
+    /*
+    favoritesStream = FirebaseFirestore.instance
+        .collection('Favorites')
+        .doc(_auth.currentUser!.uid)
+        .snapshots(); //query to user's favorite list and see if the EIN is in there and set isFavorite = true if found
+        */
+
+    favoritesStream = FirebaseFirestore.instance
+        .collection("EndUsers/" + _auth.currentUser!.uid + "/Favorites")
+        .where("EIN", isEqualTo: widget.ngoInfo.returnEIN())
+        .where("isOrg", isEqualTo: true)
+        .limit(1)
+        .snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('Favorites')
-            .doc(_auth.currentUser!.uid)
-            .snapshots(), //query to user's favorite list and see if the EIN is in there and set isFavorite = true if found
-        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+    return StreamBuilder<dynamic>(
+        stream: favoritesStream,
+        builder: (context, AsyncSnapshot snapshot) {
+          /*
           if (snapshot.hasData) {
             for (var i in snapshot.data!.get('Favorite Organizations')) {
               if (i == widget.ngoInfo.ein) {
                 _isFavorite = true;
               }
+            }
+          }
+          */
+
+          if (snapshot.hasData) {
+            if (snapshot.data.docs.length > 0) {
+              _isFavorite = true;
             }
           }
 
@@ -83,10 +103,19 @@ class Detail_Page_State extends State<Detail_Page> {
                                   //add to firebase
                                   fbservice.addUserFavoriteOrganizationData(
                                       widget.ngoInfo.ein);
+                                  //add to EndUsers subcollection
+                                  fbservice
+                                      .addUserFavoriteOrganizationDataSubcollection(
+                                          widget.ngoInfo.ein);
                                 } else {
                                   //remove from firebase
                                   fbservice.removeUserFavoriteOrganizationData(
                                       widget.ngoInfo.ein);
+
+                                  //add to EndUsers subcollection
+                                  fbservice
+                                      .removeUserFavoriteOrganizationDataSubcollection(
+                                          widget.ngoInfo.ein);
                                 }
                               });
                             },

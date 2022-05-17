@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/screens/profile/set_pw_screen.dart';
 
+// ignore: camel_case_types
 class my_setting_screen extends StatefulWidget {
+  const my_setting_screen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return my_setting_screenState();
   }
 }
 
+// ignore: camel_case_types
 class my_setting_screenState extends State<my_setting_screen> {
   bool isOpen = true;
 
@@ -20,19 +24,19 @@ class my_setting_screenState extends State<my_setting_screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Setting and Privacy'),
+        title: const Text('Setting and Privacy'),
         centerTitle: true,
         backgroundColor: Colors.grey.shade400,
         elevation: 0,
       ),
       body: Container(
-          padding: EdgeInsets.all(15),
+          padding: const EdgeInsets.all(15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
-              Text('Account Settings'),
-              SizedBox(height: 30),
+              const SizedBox(height: 20),
+              const Text('Account Settings'),
+              const SizedBox(height: 30),
               GestureDetector(
                   onTap: () {
                     Navigator.push(context,
@@ -42,16 +46,16 @@ class my_setting_screenState extends State<my_setting_screen> {
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    children: const [
                       Text('Change Password'),
                       Icon(Icons.arrow_forward_ios, size: 20)
                     ],
                   )),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Push notifications'),
+                  const Text('Push notifications'),
                   GestureDetector(
                       onTap: () {
                         setState(() {

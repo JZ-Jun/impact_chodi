@@ -40,15 +40,15 @@ class event_detail_page_state extends State<event_detail_page> {
   final ShareModal shareModal = ShareModal();
   final FirebaseService fbservice = FirebaseService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late Stream<DocumentSnapshot> favoriteList;
-  late Stream<DocumentSnapshot> registeredForList;
+  late Stream favoriteList;
+  late Stream registeredForList;
 
   bool _isMark = false;
   bool _isShare = false;
   bool _isFavorite = false;
   bool descTextShowFlag = false;
   bool descTextShowFlag2 = false;
-  late int availableSpace;
+
   late int totalSpace;
 
   String? startDate;
@@ -61,9 +61,19 @@ class event_detail_page_state extends State<event_detail_page> {
 
   @override
   void initState() {
+    /*
     favoriteList = FirebaseFirestore.instance
         .collection('Favorites')
         .doc(_auth.currentUser!.uid)
+        .snapshots();
+        */
+
+    favoriteList = FirebaseFirestore.instance
+        .collection("EndUsers/" + _auth.currentUser!.uid + "/Favorites")
+        .where("EIN", isEqualTo: widget.ngoEIN)
+        .where("eventCode", isEqualTo: widget.ngoEvent.eventID)
+        .where("isOrg", isEqualTo: false)
+        .limit(1)
         .snapshots();
 
     registeredForList = FirebaseFirestore.instance
@@ -71,11 +81,6 @@ class event_detail_page_state extends State<event_detail_page> {
         .doc(_auth.currentUser!.uid)
         .snapshots();
 
-    availableSpace = widget.ngoEvent.returnAvailableSpace();
-
-    if (availableSpace > widget.ngoEvent.totalSpace) {
-      availableSpace = widget.ngoEvent.totalSpace;
-    }
     super.initState();
   }
 
@@ -91,15 +96,22 @@ class event_detail_page_state extends State<event_detail_page> {
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: CombineLatestStream.list([favoriteList, registeredForList]),
-        builder: (context, AsyncSnapshot<dynamic> snapshot) {
+        builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
+            /*
             try {
-              var _isThere = snapshot.data[0]!
-                  .get("Favorite Events")[widget.ngoEvent.eventID];
+              var _isThere = snapshot.data[0]!.get("Favorite Events")[widget.ngoEvent.eventID];
               if (_isThere != null) {
                 _isFavorite = true;
               }
             } catch (e) {
+              _isFavorite = false;
+            }
+            */
+
+            if (snapshot.data[0]!.docs.length == 1) {
+              _isFavorite = true;
+            } else {
               _isFavorite = false;
             }
 
@@ -115,6 +127,7 @@ class event_detail_page_state extends State<event_detail_page> {
             }
           }
           _getDates(widget.ngoEvent.startTime, widget.ngoEvent.endTime);
+
           return Scaffold(
             appBar: AppBar(
               title: const Text('Event Details',
@@ -212,18 +225,17 @@ class event_detail_page_state extends State<event_detail_page> {
                                                 }).then((value) {
                                                 if (value == 1) {
                                                   //remove from firebase
-                                                  availableSpace =
-                                                      availableSpace + 1;
                                                   fbservice.unregisterForEvent(
-                                                      widget.ngoEvent.eventID,
-                                                      widget.ngoEIN,
-                                                      availableSpace);
+                                                    widget.ngoEvent.eventID,
+                                                    widget.ngoEIN,
+                                                  );
                                                   setState(() {
                                                     _isMark = false;
                                                   });
                                                 }
                                               })
-                                            : availableSpace >
+                                            : widget.ngoEvent
+                                                        .returnAvailableSpace() >
                                                     0 //User is not registered and space is available
                                                 ? showDialog(
                                                     context: context,
@@ -231,7 +243,8 @@ class event_detail_page_state extends State<event_detail_page> {
                                                       return AlertDialog(
                                                         title: const Text(
                                                             'Registration'),
-                                                        content: availableSpace >
+                                                        content: widget.ngoEvent
+                                                                    .returnAvailableSpace() >
                                                                 1
                                                             ? Text(
                                                                 'There are ${widget.ngoEvent.returnAvailableSpace()} spaces available.\nWould you like to register?')
@@ -276,14 +289,12 @@ class event_detail_page_state extends State<event_detail_page> {
                                                     }).then((value) {
                                                     if (value == 1) {
                                                       //add to firebase
-                                                      availableSpace =
-                                                          availableSpace - 1;
+
                                                       fbservice
                                                           .registerForEvent(
-                                                              widget.ngoEvent
-                                                                  .eventID,
-                                                              widget.ngoEIN,
-                                                              availableSpace);
+                                                        widget.ngoEvent.eventID,
+                                                        widget.ngoEIN,
+                                                      );
                                                       setState(() {
                                                         _isMark = true;
                                                       });

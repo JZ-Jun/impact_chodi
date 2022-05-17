@@ -25,7 +25,7 @@ class my_favorite_screenState extends State<my_favorite_screen> {
   int typeIndex = 0;
 
   late Stream userFavorites;
-  final FirebaseAuth _user = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final ScrollController _scrollController = ScrollController();
 
   var favOrgs = [];
@@ -41,9 +41,14 @@ class my_favorite_screenState extends State<my_favorite_screen> {
 
     userFavorites = FirebaseFirestore.instance
         .collection("Favorites")
-        .doc(_user.currentUser!.uid)
+        .doc(_auth.currentUser!.uid)
         .snapshots();
 
+    /*
+    userFavorites = FirebaseFirestore.instance
+        .collection("EndUsers/" + _auth.currentUser!.uid + "/Favorites")
+        .snapshots();
+*/
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -70,6 +75,7 @@ class my_favorite_screenState extends State<my_favorite_screen> {
           } else {
             _clearList();
             //log(snapshot.data.data().toString());
+
             for (var i in snapshot.data.data()['Favorite Organizations']) {
               favOrgs.add(i);
             }
