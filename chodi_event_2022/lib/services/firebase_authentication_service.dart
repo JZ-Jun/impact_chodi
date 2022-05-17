@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +39,7 @@ class FirebaseService extends ChangeNotifier {
                       "SecurityQuestionAnswer": securityQuestionAnswer,
                       "lastUpdated": Timestamp.now(),
                       "imageURL": '',
+                      "Gender": '',
                     }).then((res) async => {
                               await FirebaseFirestore.instance
                                   .collection('Favorites')
@@ -276,6 +279,21 @@ class FirebaseService extends ChangeNotifier {
     }
   }
 
+  Future addUserFavoriteOrganizationDataSubcollection(var ein) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      await favorites.doc(ein).set({
+        "EIN": ein,
+        "eventCode": '',
+        "isOrg": true,
+      });
+    }
+  }
+
   Future removeUserFavoriteOrganizationData(var ein) async {
     final user = _auth.currentUser;
 
@@ -287,6 +305,18 @@ class FirebaseService extends ChangeNotifier {
       await favorites.doc(user.uid).update({
         "Favorite Organizations": FieldValue.arrayRemove([ein]),
       });
+    }
+  }
+
+  Future removeUserFavoriteOrganizationDataSubcollection(var ein) async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      //assume Favorites doc is already created
+      await favorites.doc(ein).delete();
     }
   }
 
@@ -305,6 +335,20 @@ class FirebaseService extends ChangeNotifier {
     }
   }
 
+  Future addUserFavoriteEventSubcollection(var ein, var eventCode) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      await favorites.doc(eventCode).set({
+        "EIN": ein,
+        "eventCode": eventCode,
+        "isOrg": false,
+      });
+    }
+  }
+
   Future removeUserFavoriteEvent(var eventID) async {
     final user = _auth.currentUser;
 
@@ -319,45 +363,55 @@ class FirebaseService extends ChangeNotifier {
     }
   }
 
+  Future removeUserFavoriteEventSubcollection(var eventCode) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      CollectionReference favorites = FirebaseFirestore.instance
+          .collection("EndUsers/" + user.uid + "/Favorites");
+
+      await favorites.doc(eventCode).delete();
+    }
+  }
+
   //Registration for Event
-  Future registerForEvent(var eventID, var ngoEIN, var availableSpace) async {
+  Future registerForEvent(var eventID, var ngoEIN) async {
     final user = _auth.currentUser;
 
     if (user != null) {
       CollectionReference endUsers =
           FirebaseFirestore.instance.collection('EndUsers');
-
-      CollectionReference nonprofits = FirebaseFirestore.instance
-          .collection("Nonprofits/" + ngoEIN + "/Events");
 
       await endUsers.doc(user.uid).update({
         'registeredFor.$eventID': Timestamp.now(),
       });
 
-      await nonprofits.doc(eventID).update({
-        'Volunteers.${user.uid}': Timestamp.now(),
-        'availableSpace': availableSpace
+      CollectionReference events =
+          FirebaseFirestore.instance.collection('Events (User)');
+
+      await events.doc(eventID).update({
+        'attendees.${user.uid}': user.email,
       });
     }
   }
 
-  Future unregisterForEvent(var eventID, var ngoEIN, var availableSpace) async {
+  Future unregisterForEvent(var eventID, var ngoEIN) async {
     final user = _auth.currentUser;
 
     if (user != null) {
       CollectionReference endUsers =
           FirebaseFirestore.instance.collection('EndUsers');
-      CollectionReference nonprofits = FirebaseFirestore.instance
-          .collection("Nonprofits/" + ngoEIN + "/Events");
 
       //assume Favorites doc is already created
       await endUsers.doc(user.uid).update({
         'registeredFor.$eventID': FieldValue.delete(),
       });
 
-      await nonprofits.doc(eventID).update({
-        'Volunteers.${user.uid}': FieldValue.delete(),
-        'availableSpace': availableSpace
+      CollectionReference events =
+          FirebaseFirestore.instance.collection('Events (User)');
+
+      await events.doc(eventID).update({
+        //delete according to current user's uid
+        'attendees.${user.uid}': FieldValue.delete(),
       });
     }
   }

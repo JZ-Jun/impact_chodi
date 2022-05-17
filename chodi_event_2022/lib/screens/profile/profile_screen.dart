@@ -100,7 +100,7 @@ class profile_screenState extends State<profile_screen> {
                       snapshot.data["imageURL"],
                       snapshot.data["Username"] ?? '',
                       snapshot.data["Age"] ?? '',
-                      ''),
+                      snapshot.data["Gender"] ?? ''),
                   const SizedBox(height: 15),
                   buildItem(1, Icons.calendar_month, 'Registered Events', '',
                       '', '', ''),

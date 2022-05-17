@@ -65,7 +65,6 @@ class event_page_state extends State<event_page> {
     DateTime dt2 = DateTime.parse(startTime.toDate().toIso8601String());
 
     Duration diff = dt2.difference(dt1);
-
     int days = diff.inDays;
 
     if (days > 1) {
@@ -100,15 +99,33 @@ class event_page_state extends State<event_page> {
 
   @override
   void initState() {
+    /*
     dataList = FirebaseFirestore.instance
         .collection("Nonprofits/" + widget.ngoInfo.ein + "/Events")
         .orderBy("endTime", descending: true)
         .where("endTime", isGreaterThanOrEqualTo: DateTime.now())
         .snapshots();
+        */
 
+    dataList = FirebaseFirestore.instance
+        .collection("Events (User)")
+        .where('EIN', isEqualTo: widget.ngoInfo.ein)
+        //.where("endTime", isGreaterThanOrEqualTo: DateTime.now())
+        .snapshots();
+
+    /*
     favoriteList = FirebaseFirestore.instance
         .collection('Favorites')
         .doc(_auth.currentUser!.uid)
+        .snapshots();
+        //DocumentSnapshot
+  */
+
+    //Event in EndUsers/id/Favorites needs both EIN and isOrg
+    favoriteList = FirebaseFirestore.instance
+        .collection("EndUsers/" + _auth.currentUser!.uid + "/Favorites")
+        .where("EIN", isEqualTo: widget.ngoInfo.returnEIN())
+        .where("isOrg", isEqualTo: false)
         .snapshots();
 
     super.initState();
@@ -127,6 +144,8 @@ class event_page_state extends State<event_page> {
             _clearList();
 
             for (var i in snapshot.data[0]!.docs) {
+              //log(i["eventCode"].toString());
+
               ngoEvents.add(Event.fromFirestore(i));
             }
 
@@ -202,8 +221,12 @@ class event_page_state extends State<event_page> {
                           child: ListView.builder(
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
+                                /*
                                 return buildItem('10', index, ngoEvents[index],
                                     snapshot.data[1]!);
+                                    */
+                                return buildItem('10', index, ngoEvents[index],
+                                    snapshot.data[1]);
                               },
                               itemCount: ngoEvents.length,
                               scrollDirection: Axis.vertical),
@@ -219,16 +242,28 @@ class event_page_state extends State<event_page> {
         });
   }
 
-  buildItem(String hour, int index, Event event, DocumentSnapshot eventList) {
+  //buildItem(String hour, int index, Event event, DocumentSnapshot eventList) {
+  buildItem(String hour, int index, Event event, QuerySnapshot eventList) {
     int day = _parseDayTimeStamp(event.startTime);
     String month = _parseMonthTimeStamp(event.startTime);
 
     bool _isFavorite = false;
+    var _isThere = false;
 
     //check if user already favorited it
     try {
-      var _isThere = eventList.get("Favorite Events")[event.eventID];
-      if (_isThere != null) {
+      //var _isThere = eventList.get("Favorite Events")[event.eventID]; //for DocumentSnapshot
+
+      //check if eventID is in the eventList
+      for (var i in eventList.docs) {
+        //log(i["eventCode"].toString());
+
+        if (i["eventCode"] == event.eventID) {
+          _isThere = true;
+        }
+      }
+
+      if (_isThere == true) {
         _isFavorite = true;
       }
     } catch (e) {
@@ -300,10 +335,19 @@ class event_page_state extends State<event_page> {
                                     //add to firebase
                                     fbservice.addUserFavoriteEvent(
                                         widget.ngoInfo.ein, event.eventID);
+
+                                    //add to EndUsers subcollection
+                                    fbservice.addUserFavoriteEventSubcollection(
+                                        widget.ngoInfo.ein, event.eventID);
                                   } else {
                                     //remove from firebase
                                     fbservice
                                         .removeUserFavoriteEvent(event.eventID);
+
+                                    //add to EndUsesr subcollection
+                                    fbservice
+                                        .removeUserFavoriteEventSubcollection(
+                                            event.eventID);
                                   }
                                 });
                               },
