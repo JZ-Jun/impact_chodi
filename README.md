@@ -5,7 +5,9 @@ A new Flutter project.
 # chodi_for you module.
 # chodi_message module.
 # chodi_events module.
-# Code: Jun Zhu, Yuxi Ge, Yilin Li, Database: James,Ashley
+# chodi_profile module.
+# Front end development: Jun Zhu, Yuxi Ge, Yilin Li. 
+# Firebase: James,Ashley.
 
 
 
