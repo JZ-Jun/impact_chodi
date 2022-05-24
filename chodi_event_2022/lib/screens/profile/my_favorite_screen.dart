@@ -4,13 +4,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chodi_app/models/event.dart';
 import 'package:flutter_chodi_app/models/nonprofit_organization.dart';
+import 'package:flutter_chodi_app/screens/foryou/event_detail_page.dart';
 import 'package:flutter_chodi_app/screens/calendar/event_detail_page2.dart';
 import 'package:flutter_chodi_app/screens/calendar/search_event_page.dart';
 import 'package:flutter_chodi_app/screens/foryou/detail_page.dart';
 import 'package:flutter_chodi_app/screens/foryou/search_page.dart';
 import 'package:quiver/iterables.dart';
 import 'package:r_calendar/r_calendar.dart';
+import 'package:flutterfire_ui/firestore.dart';
 
 // ignore: camel_case_types
 class my_favorite_screen extends StatefulWidget {
@@ -30,8 +33,12 @@ class my_favorite_screenState extends State<my_favorite_screen> {
 
   var favOrgs = [];
   var favEvents = [];
-  List<NonProfitOrg> favOrgList = [];
 
+  //Used to build List Widgets
+  List<NonProfitOrg> favOrgList = [];
+  List<Event> favEventList = [];
+
+  //Was supposed to be used with infinite scrolling pagination
   int lastLoadedFavOrgs = 0;
   int finalLoadedFavOrgs = 0;
 
@@ -53,14 +60,21 @@ class my_favorite_screenState extends State<my_favorite_screen> {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         log("Load more");
+        _loadMore();
       }
     });
+  }
+
+  _loadMore() {
+    if (typeIndex == 0) {
+    } else {}
   }
 
   _clearList() {
     favOrgs.clear();
     favOrgList.clear();
     favEvents.clear();
+    favEventList.clear();
   }
 
   @override
@@ -156,22 +170,40 @@ class my_favorite_screenState extends State<my_favorite_screen> {
     switch (typeIndex) {
       case 0:
         return StreamBuilder(
-            stream: null,
+            stream: FirebaseFirestore.instance
+                .collection("Events (User)")
+                .snapshots(),
             builder: (context, AsyncSnapshot snapshot) {
-              return GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      //横轴元素个数
-                      crossAxisCount: 2,
-                      //纵轴间距
-                      mainAxisSpacing: 20.0,
-                      //横轴间距
-                      crossAxisSpacing: 20.0,
-                      //子组件宽高长度比例
-                      childAspectRatio: 0.8),
-                  itemBuilder: (context, index) {
-                    return buildItem();
-                  },
-                  itemCount: 2);
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Container();
+              } else {
+                for (var x in snapshot.data!.docs) {
+                  for (var y in favEvents) {
+                    if (x['eventCode'] == y[0]) {
+                      favEventList.add(Event.fromFirestore(x));
+                    }
+                  }
+                }
+
+                return GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            //横轴元素个数
+                            crossAxisCount: 2,
+                            //纵轴间距
+                            mainAxisSpacing: 20.0,
+                            //横轴间距
+                            crossAxisSpacing: 20.0,
+                            //子组件宽高长度比例
+                            childAspectRatio: 0.8),
+                    itemBuilder: (context, index) {
+                      return buildItemEvent(favEventList[index].name,
+                          favEventList[index].imageURL, favEventList[index]);
+                    },
+                    itemCount: favEventList.length);
+              }
             });
       case 1:
         return StreamBuilder(
@@ -221,6 +253,43 @@ class my_favorite_screenState extends State<my_favorite_screen> {
             return Detail_Page(
               ngoInfo: ngo,
             );
+          }));
+        },
+        child: Container(
+          decoration:
+              BoxDecoration(border: Border.all(color: Colors.grey.shade400)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 15),
+              Container(
+                alignment: Alignment.center,
+                child: CachedNetworkImage(
+                  imageUrl: imageURL,
+                  width: 150,
+                  height: 150,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                  child: Container(
+                      color: Colors.grey.shade300,
+                      alignment: Alignment.center,
+                      child: Text(name,
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)))),
+            ],
+          ),
+        ));
+  }
+
+  buildItemEvent(String name, String imageURL, Event event) {
+    return GestureDetector(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return event_detail_page(
+                ngoEvent: event, ngoName: name, ngoEIN: event.ein);
           }));
         },
         child: Container(

@@ -30,8 +30,8 @@ class _LineChartState extends State<LineChart> {
   double totalDonations = 0;
   double maxEventHours = 0;
   double maxDonations = 0;
-  String userUID = "SM5W6pnRdqMgQW1znKusvHXpjHT2";
-  //String userUID = FirebaseAuth.instance.currentUser!.uid;
+  //String userUID = "SM5W6pnRdqMgQW1znKusvHXpjHT2"; //using a uid that already exists in Firebase
+  String userUID = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -90,9 +90,11 @@ class _LineChartState extends State<LineChart> {
   @override
   Widget build(BuildContext context) {
     //print selectorType
+    /*
     log(widget.selectorType.toString());
     log(widget.month.toString());
     log(widget.year.toString());
+    */
     _resetChartData();
 
     _chooseFirebaseStream(widget.selectorType);

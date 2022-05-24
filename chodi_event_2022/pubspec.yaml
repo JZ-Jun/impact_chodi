@@ -63,6 +63,7 @@ dependencies:
   firebase_analytics: ^9.1.5
   firebase_analytics_web: ^0.4.0+10
   flutter_email_sender: ^5.1.0
+  flutterfire_ui: ^0.4.1
   
   nanoid: ^1.0.0
 

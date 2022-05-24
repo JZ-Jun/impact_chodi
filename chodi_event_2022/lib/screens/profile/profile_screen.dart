@@ -113,20 +113,22 @@ class profile_screenState extends State<profile_screen> {
                   Container(height: 1, color: Colors.grey.shade200),
                   const SizedBox(height: 20),
                   Row(
-                    children: const [
-                      SizedBox(width: 10),
-                      Icon(Icons.phone, size: 30),
-                      SizedBox(width: 40),
-                      Text("+1 (239) 876-554"),
+                    children: [
+                      const SizedBox(width: 10),
+                      const Icon(Icons.phone, size: 30),
+                      const SizedBox(width: 40),
+                      const Text("+1 (239) 876-554"),
+                      //Text(_user.currentUser!.phoneNumber!),
                     ],
                   ),
                   const SizedBox(height: 15),
                   Row(
-                    children: const [
-                      SizedBox(width: 10),
-                      Icon(Icons.email, size: 30),
-                      SizedBox(width: 40),
-                      Text("191abChoDi@gmail.com"),
+                    children: [
+                      const SizedBox(width: 10),
+                      const Icon(Icons.email, size: 30),
+                      const SizedBox(width: 40),
+                      const Text("191abChoDi@gmail.com"),
+                      //Text(_user.currentUser!.email!)
                     ],
                   )
                 ],
@@ -163,7 +165,7 @@ class profile_screenState extends State<profile_screen> {
               break;
             case 3:
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return my_setting_screen();
+                return const my_setting_screen();
               }));
               break;
             default:
