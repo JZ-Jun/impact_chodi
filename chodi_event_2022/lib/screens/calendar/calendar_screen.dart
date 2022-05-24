@@ -27,7 +27,10 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   FirebaseService fbservice = FirebaseService();
+  RCalendarController rcontroller = RCalendarController.single(
+      selectedDate: DateTime.now(), isAutoSelect: true);
   int typeIndex = 0;
+  bool refresh = false;
 
   late Stream<QuerySnapshot> allNGOs;
 
@@ -59,6 +62,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void initState() {
     super.initState();
+    rcontroller.addListener(() {
+      setState(() {
+        rcontroller = RCalendarController.single(
+            selectedDate:
+                rcontroller.selectedDate); //change selected date on Agenda
+      });
+    });
     userData = FirebaseFirestore.instance
         .collection("EndUsers")
         .doc(FirebaseAuth.instance.currentUser?.uid)
@@ -71,7 +81,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   }*/
 
-  showDetailDialog() {
+  _clearLists() {
+    eventList.clear();
+    registeredEventList.clear();
+    favoritedEventList.clear();
+  }
+
+  showDetailDialog(int index) {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -90,9 +106,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       onTap: () => Navigator.pop(context),
                       child: const Icon(Icons.keyboard_arrow_down, size: 30)),
                   const SizedBox(height: 10),
-                  const Text('Ronald McDonald Childrens Charities San Deigo'),
+                  Text(registeredEventList[index].orgName),
                   const SizedBox(height: 15),
-                  const Text('Fammily Fridays', style: TextStyle(fontSize: 28)),
+                  Text(registeredEventList[index].name,
+                      style: const TextStyle(fontSize: 28)),
                   const SizedBox(height: 15),
                   Container(
                     width: 130,
@@ -101,20 +118,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(15))),
                     alignment: Alignment.center,
-                    child: Image.asset('assets/images/qrcode.png', width: 110),
+                    child: Image.asset('assets/images/qrcode.png',
+                        width: 110), //QR CODE FUNCTIONALITY
                   ),
                   const SizedBox(height: 15),
-                  const Text('Volunteer'),
+                  Text(registeredEventList[index].eventType),
                   const SizedBox(height: 10),
                   const Text(
                     'Thi Nguyen',
                     style: TextStyle(fontSize: 22),
                   ),
                   const SizedBox(height: 15),
-                  const Text('Ticket / Seating'),
+                  const Text('Ticket/Seating'),
                   const SizedBox(height: 10),
                   const Text(
-                    'Generaln',
+                    'General',
                     style: TextStyle(fontSize: 20),
                   ),
                   const SizedBox(height: 15),
@@ -124,9 +142,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 10),
-                  const Align(
+                  Align(
                     alignment: Alignment.topLeft,
-                    child: Text('December 12,2020 - December 15,2020'),
+                    child: Text(
+                        '${DateFormat('MMMM dd, yyyy').format(registeredEventList[index].startTime.toDate().toLocal())} - ${DateFormat('MMMM dd, yyyy').format(registeredEventList[index].endTime.toDate().toLocal())}'),
                   ),
                   const SizedBox(height: 15),
                   const Align(
@@ -135,9 +154,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 10),
-                  const Align(
+                  Align(
                     alignment: Alignment.topLeft,
-                    child: Text('12:00 AM - 11:00 PM'),
+                    child: Text(
+                        '${DateFormat('EEEE,').add_jm().format(registeredEventList[index].startTime.toDate().toLocal())} - ${DateFormat('EEEE,').add_jm().format(registeredEventList[index].endTime.toDate().toLocal())}'),
                   ),
                   const SizedBox(height: 15),
                   const Align(
@@ -146,14 +166,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 10),
-                  const Align(
+                  Align(
                     alignment: Alignment.topLeft,
-                    child: Text('1693 San Vicente Blvd #113 '),
+                    child: registeredEventList[index].city == ''
+                        ? Text(registeredEventList[index].city)
+                        : const Text("No address specified"),
                   ),
                   const SizedBox(height: 10),
-                  const Align(
+                  Align(
                     alignment: Alignment.topLeft,
-                    child: Text('Los Angeles,CA 90049 United States'),
+                    child: Text(
+                        '${registeredEventList[index].city}, ${registeredEventList[index].state} ${registeredEventList[index].zip} ${registeredEventList[index].country}'),
                   ),
                   const SizedBox(height: 15),
                   Container(
@@ -163,7 +186,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       border: Border.all(color: Colors.grey.shade400),
                     ),
                     alignment: Alignment.center,
-                    child: const Text('map'),
+                    child: const Text('Map'),
                   ),
                   const SizedBox(height: 15),
                 ],
@@ -172,9 +195,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   showDateDialog() {
-    RCalendarController controller = RCalendarController.single(
-        selectedDate: DateTime.now(), isAutoSelect: true)
-      ..addListener(() {});
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -216,10 +236,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       Container(
                         alignment: Alignment.center,
                         child: RCalendarWidget(
-                          controller: controller,
+                          controller: rcontroller,
                           customWidget: DefaultRCalendarCustomWidget(),
-                          firstDate: DateTime(1970, 1, 1),
-                          lastDate: DateTime.now(),
+                          firstDate: DateTime(2022, 1, 1),
+                          lastDate: DateTime(DateTime.now().year + 1, 1, 1),
                         ),
                       ),
                     ],
@@ -238,9 +258,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           } else if (snapshot.hasError) {
             return Container();
           } else {
-            eventList.clear();
-            registeredEventList.clear();
-
+            _clearLists();
             //add each of these events to the eventList
             for (var i in snapshot.data!.docs) {
               eventList.add(Event.fromFirestore(i));
@@ -279,7 +297,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   for (int i = 0; i < eventList.length; i++) {
                     for (int j = 0; j < eventList[i].attendees.length; j++) {
                       if (eventList[i].attendees.containsValue(email)) {
-                        registeredEventList.add(eventList[i]);
+                        if (rcontroller.selectedDate!
+                            .isBefore(eventList[i].endTime.toDate())) {
+                          registeredEventList.add(eventList[i]);
+                        }
+
+                        /*
+                        bool after = rcontroller.selectedDate!
+                            .isAfter(eventList[i].startTime.toDate());
+                        bool before = rcontroller.selectedDate!
+                            .isBefore(eventList[i].endTime.toDate());
+                        log(rcontroller.selectedDate.toString());
+                        log(eventList[i].startTime.toDate().toString());
+                        log(after.toString());
+                        log(before.toString());
+                        */
+
                         //break to prevent duplicate attendee events (according to number of attendees)
                         // from showing up
 
@@ -396,6 +429,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ))
                         ],
                       ),
+                      const SizedBox(height: 10),
                       Expanded(child: buildMain())
                     ],
                   ),
@@ -411,42 +445,53 @@ class _CalendarScreenState extends State<CalendarScreen> {
       case 1:
         return SingleChildScrollView(
           child: Column(
-            children: [buildLikes()],
+            children: <Widget>[
+              ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: favoritedEventList.length,
+                  itemBuilder: (context, index) {
+                    return buildListWidget(index, favoritedEventList);
+                  }),
+            ],
           ),
         );
+
       case 2:
         return SingleChildScrollView(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Text('Displaying all ' +
-                    eventList.length.toString() +
-                    ' events')),
-            buildExplore(),
-            buildExplore(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
-                Text('More'),
-                SizedBox(width: 5),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 20,
-                ),
-                SizedBox(width: 15),
-              ],
-            ),
-            const SizedBox(height: 10),
-          ],
-        ));
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: eventList.length == 1
+                          ? Text('Displaying ' +
+                              eventList.length.toString() +
+                              ' event')
+                          : Text('Displaying ' +
+                              eventList.length.toString() +
+                              ' events')),
+                  const SizedBox(height: 10),
+                ],
+              ),
+              ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: eventList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return buildListWidget(index, eventList);
+                  })
+            ],
+          ),
+        );
+
       default:
     }
   }
 
-  buildLikes() {
+  buildListWidget(int index, List eventList) {
     return favoritedEventList.isNotEmpty
         ? StreamBuilder(
             stream: userData, //to check if registered
@@ -462,7 +507,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 //set default state for Bookmark
                 try {
                   var _isRegistered = snapshot.data.data()["registeredFor"]
-                      [favoritedEventList[0].eventID];
+                      [eventList[index].eventID];
 
                   if (_isRegistered != null) {
                     _isBookmark = true;
@@ -476,15 +521,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
                         return event_detail_page(
-                          ngoEvent: favoritedEventList[0],
-                          ngoName: favoritedEventList[0].orgName,
-                          ngoEIN: favoritedEventList[0].ein,
+                          ngoEvent: eventList[index],
+                          ngoName: eventList[index].orgName,
+                          ngoEIN: eventList[index].ein,
                         );
                       }));
                     },
                     child: Container(
                         width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.all(30),
+                        margin: const EdgeInsets.only(
+                            bottom: 30, left: 30, right: 30, top: 10),
                         padding: const EdgeInsets.only(bottom: 15),
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey),
@@ -498,21 +544,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 //Image.asset('assets/images/fy.png', width: 120),
 
                                 CachedNetworkImage(
-                                    imageUrl: favoritedEventList[0].imageURL,
+                                    imageUrl: eventList[index].imageURL,
                                     width: 120),
                                 const SizedBox(width: 20),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     //ideally all of the [0]'s below would become [i] or some other way to iterate through the whole list
-                                    Text(favoritedEventList[0].name,
+                                    Text(eventList[index].name,
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     const SizedBox(height: 5),
-                                    Text(favoritedEventList[0].orgName),
+                                    Text(eventList[index].orgName),
                                     const SizedBox(height: 5),
-                                    Text(favoritedEventList[0]
-                                        .locationDescription),
+                                    Text(eventList[index].locationDescription),
                                   ],
                                 )
                               ],
@@ -521,7 +566,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             Container(
                                 padding:
                                     const EdgeInsets.only(left: 15, right: 15),
-                                child: Text(favoritedEventList[0].description)),
+                                child: Text(eventList[index].description)),
                             const SizedBox(height: 20),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -531,11 +576,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       //Check in Firebase
                                       verifyRegistration(
                                           _isBookmark,
-                                          favoritedEventList[0].totalSpace,
-                                          favoritedEventList[0]
-                                              .attendees
-                                              .length,
-                                          favoritedEventList[0]);
+                                          eventList[index].totalSpace,
+                                          eventList[index].attendees.length,
+                                          eventList[index]);
                                     },
                                     child: _isBookmark
                                         ? const Icon(Icons.bookmark,
@@ -552,25 +595,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                         if (_isFavoriteLikes) {
                                           //add to firebase
                                           fbservice.addUserFavoriteEvent(
-                                              favoritedEventList[0].ein,
-                                              favoritedEventList[0].eventID);
+                                              eventList[index].ein,
+                                              eventList[index].eventID);
 
                                           //add to EndUsers subcollection
                                           fbservice
                                               .addUserFavoriteEventSubcollection(
-                                                  favoritedEventList[0].ein,
-                                                  favoritedEventList[0]
-                                                      .eventID);
+                                                  eventList[index].ein,
+                                                  eventList[index].eventID);
                                         } else {
                                           //remove from firebase
                                           fbservice.removeUserFavoriteEvent(
-                                              favoritedEventList[0].eventID);
+                                              eventList[index].eventID);
 
                                           //add to EndUsesr subcollection
                                           fbservice
                                               .removeUserFavoriteEventSubcollection(
-                                                  favoritedEventList[0]
-                                                      .eventID);
+                                                  eventList[index].eventID);
                                         }
                                       });
                                     },
@@ -588,6 +629,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         : const Text("");
   }
 
+/*
   buildExplore() {
     bool _isOwnBookmark = false;
     bool _isFavoriteExplore = false;
@@ -671,11 +713,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           )),
     );
   }
-
+*/
   buildRsvp() {
     return Column(
       children: [
-        const SizedBox(height: 25),
         GestureDetector(
             onTap: () => showDateDialog(),
             child: Container(
@@ -694,7 +735,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
             child: Text(
               'Displaying ' +
                   registeredEventList.length.toString() +
-                  ' registered events',
+                  ' registered events on ' +
+                  DateFormat('MMMM dd')
+                      .format(rcontroller.selectedDate!.toLocal()),
               style: const TextStyle(color: Colors.grey),
             )),
         Expanded(
@@ -711,7 +754,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   //子组件宽高长度比例
                   childAspectRatio: 0.8),
               itemBuilder: (context, index) {
-                return buildItem();
+                return buildGridWidget(index);
               },
               itemCount: registeredEventList.length),
         ))
@@ -722,29 +765,31 @@ class _CalendarScreenState extends State<CalendarScreen> {
   //may want to turn into a string that takes in a List<Event> (ie. registeredEventsList)
   //and builds items for every item on the list
   //for now I'll just update to take from first index in the list
-  buildItem() {
+  buildGridWidget(int index) {
     return GestureDetector(
-        onTap: () => showDetailDialog(),
+        onTap: () => showDetailDialog(index),
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration:
               BoxDecoration(border: Border.all(color: Colors.grey.shade400)),
-          child: Wrap(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("${registeredEventList[0].name}\n",
+              Text(registeredEventList[index].name,
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              Text(DateFormat('EEEE, MMMM dd - ')
-                  .add_jm()
-                  .format(registeredEventList[0].startTime.toDate().toLocal())),
+              Text(DateFormat('MMMM dd yyyy,').add_jm().format(
+                  registeredEventList[index].startTime.toDate().toLocal())),
               const SizedBox(height: 8),
-              Text("${registeredEventList[0].locationDescription}\n"),
+              Text(
+                  "${registeredEventList[index].city}, ${registeredEventList[index].state}\n"),
               const SizedBox(height: 15),
               Container(
                   alignment: Alignment.center,
                   child: CachedNetworkImage(
-                      imageUrl: registeredEventList[0].imageURL, width: 120)),
+                      imageUrl: registeredEventList[index].imageURL,
+                      width: 100)),
             ],
           ),
         ));

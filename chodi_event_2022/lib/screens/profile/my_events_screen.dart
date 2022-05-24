@@ -110,8 +110,7 @@ class my_events_screenState extends State<my_events_screen> {
                                 itemBuilder: (context, index) {
                                   return buildItem(
                                       regEventList[index].name,
-                                      convertTimestampToDate(
-                                          regEventList[index].startTime),
+                                      regEventList[index].startTime,
                                       "${regEventList[index].city}, ${regEventList[index].state}",
                                       regEventList[index].imageURL,
                                       regEventList[index]);
@@ -128,7 +127,7 @@ class my_events_screenState extends State<my_events_screen> {
         });
   }
 
-  buildItem(var eventName, var eventStartDate, var location, var imageURL,
+  buildItem(var eventName, Timestamp eventStartDate, var location, var imageURL,
       Event ngoEvent) {
     return GestureDetector(
         onTap: () {
@@ -148,13 +147,15 @@ class my_events_screenState extends State<my_events_screen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(eventName,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              Text(eventStartDate),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
+              Text(DateFormat('MMMM dd yyyy,')
+                  .add_jm()
+                  .format(eventStartDate.toDate().toLocal())),
+              const SizedBox(height: 8),
               Text(location),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Container(
                   alignment: Alignment.center,
                   child: CachedNetworkImage(

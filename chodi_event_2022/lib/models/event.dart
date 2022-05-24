@@ -65,7 +65,7 @@ class Event {
     return totalSpace - attendees.length;
   }
 
-  factory Event.fromFirestore(QueryDocumentSnapshot fbData) {
+  factory Event.fromFirestore(DocumentSnapshot fbData) {
     Map data = fbData.data() as Map;
 
     //print(data) ;
