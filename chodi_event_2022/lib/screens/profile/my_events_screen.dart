@@ -58,19 +58,21 @@ class my_events_screenState extends State<my_events_screen> {
             return Container();
           } else {
             clearRegisteredEventIDList();
+
             for (var i in snapshot.data["registeredFor"].entries) {
               registeredEventIDList.add(i.key.toString());
             }
 
+            /*
             var regEventsQueryList = partition(registeredEventIDList, 10)
                 .toList(); //get 10 registered events
             //[ [10 events] [10 events] [10 events] ]
-
+            */
             return StreamBuilder<Object>(
                 stream: FirebaseFirestore.instance
                     .collection("Events (User)")
-                    .where("eventCode",
-                        whereIn: regEventsQueryList[lastLoadedRegisteredEvents])
+                    //.where("eventCode", whereIn: regEventsQueryList[lastLoadedRegisteredEvents])
+
                     .snapshots(),
                 builder: (context, AsyncSnapshot snapshot2) {
                   if (snapshot2.connectionState == ConnectionState.waiting) {
@@ -80,7 +82,11 @@ class my_events_screenState extends State<my_events_screen> {
                   } else {
                     List<Event> regEventList = [];
                     for (var i in snapshot2.data.docs) {
-                      regEventList.add(Event.fromFirestore(i));
+                      for (var y in registeredEventIDList) {
+                        if (i["eventCode"] == y) {
+                          regEventList.add(Event.fromFirestore(i));
+                        }
+                      }
                     }
 
                     return Scaffold(

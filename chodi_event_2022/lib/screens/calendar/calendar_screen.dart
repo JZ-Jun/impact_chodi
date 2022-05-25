@@ -451,7 +451,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: favoritedEventList.length,
                   itemBuilder: (context, index) {
-                    return buildListWidget(index, favoritedEventList);
+                    return buildFavoriteListWidget(index, favoritedEventList);
                   }),
             ],
           ),
@@ -491,8 +491,146 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
   }
 
-  buildListWidget(int index, List eventList) {
+  buildFavoriteListWidget(int index, List eventList) {
     return favoritedEventList.isNotEmpty
+        ? StreamBuilder(
+            stream: userData, //to check if registered
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Container();
+              } else {
+                bool _isBookmark = false;
+                bool _isFavoriteLikes = true; //by default
+
+                //set default state for Bookmark
+                try {
+                  var _isRegistered = snapshot.data.data()["registeredFor"]
+                      [eventList[index].eventID];
+
+                  if (_isRegistered != null) {
+                    _isBookmark = true;
+                  }
+                } catch (e) {
+                  _isBookmark = false;
+                }
+
+                return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return event_detail_page(
+                          ngoEvent: eventList[index],
+                          ngoName: eventList[index].orgName,
+                          ngoEIN: eventList[index].ein,
+                        );
+                      }));
+                    },
+                    child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.only(
+                            bottom: 30, left: 30, right: 30, top: 10),
+                        padding: const EdgeInsets.only(bottom: 15),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(15),
+                                bottomRight: Radius.circular(15))),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                //Image.asset('assets/images/fy.png', width: 120),
+
+                                CachedNetworkImage(
+                                    imageUrl: eventList[index].imageURL,
+                                    width: 120),
+                                const SizedBox(width: 20),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    //ideally all of the [0]'s below would become [i] or some other way to iterate through the whole list
+                                    Text(eventList[index].name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 5),
+                                    Text(eventList[index].orgName),
+                                    const SizedBox(height: 5),
+                                    Text(eventList[index].locationDescription),
+                                  ],
+                                )
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            Container(
+                                padding:
+                                    const EdgeInsets.only(left: 15, right: 15),
+                                child: Text(eventList[index].description)),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                    onTap: () {
+                                      //Check in Firebase
+                                      verifyRegistration(
+                                          _isBookmark,
+                                          eventList[index].totalSpace,
+                                          eventList[index].attendees.length,
+                                          eventList[index]);
+                                    },
+                                    child: _isBookmark
+                                        ? const Icon(Icons.bookmark,
+                                            color: Colors.yellow)
+                                        : const Icon(Icons.bookmark_border)),
+                                const SizedBox(width: 10),
+                                GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        //Preferably remove it dynamically? The event cannot be removed right away
+                                        //when _isFavoriteLikes is clicked
+                                        _isFavoriteLikes = !_isFavoriteLikes;
+
+                                        if (_isFavoriteLikes) {
+                                          //add to firebase
+                                          fbservice.addUserFavoriteEvent(
+                                              eventList[index].ein,
+                                              eventList[index].eventID);
+
+                                          //add to EndUsers subcollection
+                                          fbservice
+                                              .addUserFavoriteEventSubcollection(
+                                                  eventList[index].ein,
+                                                  eventList[index].eventID);
+                                        } else {
+                                          //remove from firebase
+                                          fbservice.removeUserFavoriteEvent(
+                                              eventList[index].eventID);
+
+                                          //add to EndUsesr subcollection
+                                          fbservice
+                                              .removeUserFavoriteEventSubcollection(
+                                                  eventList[index].eventID);
+                                        }
+                                      });
+                                    },
+                                    child: _isFavoriteLikes
+                                        ? const Icon(Icons.favorite,
+                                            color: Colors.red)
+                                        : const Icon(Icons.favorite_border)),
+                                const SizedBox(width: 10),
+                              ],
+                            )
+                          ],
+                        )));
+              }
+            })
+        : const Text("");
+  }
+
+  buildListWidget(int index, List eventList) {
+    return eventList.isNotEmpty
         ? StreamBuilder(
             stream: userData, //to check if registered
             builder: (context, AsyncSnapshot snapshot) {

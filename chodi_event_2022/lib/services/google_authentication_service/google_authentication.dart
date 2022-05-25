@@ -112,6 +112,7 @@ class GoogleAuthentication extends ChangeNotifier {
         "lastUpdated": Timestamp.now(),
         "imageURL": '',
         "Gender": '',
+        "registeredFor": {},
 
         //after logging, redirect to another page, (use if condition to decide) then update the values.
         //Delete account if incompleted.

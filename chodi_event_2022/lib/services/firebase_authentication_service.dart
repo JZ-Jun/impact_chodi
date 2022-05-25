@@ -40,6 +40,7 @@ class FirebaseService extends ChangeNotifier {
                       "lastUpdated": Timestamp.now(),
                       "imageURL": '',
                       "Gender": '',
+                      "registeredFor": {},
                     }).then((res) async => {
                               await FirebaseFirestore.instance
                                   .collection('Favorites')

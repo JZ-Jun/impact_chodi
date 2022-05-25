@@ -8,15 +8,13 @@ import 'package:flutter_chodi_app/models/event.dart';
 import 'package:flutter_chodi_app/models/nonprofit_organization.dart';
 import 'package:flutter_chodi_app/screens/foryou/event_detail_page.dart';
 import 'package:flutter_chodi_app/screens/calendar/event_detail_page2.dart';
-import 'package:flutter_chodi_app/screens/calendar/search_event_page.dart';
 import 'package:flutter_chodi_app/screens/foryou/detail_page.dart';
-import 'package:flutter_chodi_app/screens/foryou/search_page.dart';
 import 'package:quiver/iterables.dart';
-import 'package:r_calendar/r_calendar.dart';
-import 'package:flutterfire_ui/firestore.dart';
 
 // ignore: camel_case_types
 class my_favorite_screen extends StatefulWidget {
+  const my_favorite_screen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return my_favorite_screenState();
@@ -59,7 +57,7 @@ class my_favorite_screenState extends State<my_favorite_screen> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        log("Load more");
+        //log("Load more");
         _loadMore();
       }
     });
@@ -100,8 +98,8 @@ class my_favorite_screenState extends State<my_favorite_screen> {
               favEvents.add(['$key', '$value']); //[event id, organization ein]
             });
 
-            var favOrgsQueryList = partition(favOrgs, 10).toList();
-            var favEventsQueryList = partition(favEvents, 10).toList();
+            //var favOrgsQueryList = partition(favOrgs, 10).toList();
+            //var favEventsQueryList = partition(favEvents, 10).toList();
 
             return Scaffold(
               appBar: AppBar(
@@ -157,7 +155,7 @@ class my_favorite_screenState extends State<my_favorite_screen> {
                   Expanded(
                       child: Container(
                     margin: const EdgeInsets.only(left: 15, right: 15),
-                    child: getGridView(favEventsQueryList, favOrgsQueryList),
+                    child: getGridView(),
                   ))
                 ],
               ),
@@ -166,7 +164,7 @@ class my_favorite_screenState extends State<my_favorite_screen> {
         });
   }
 
-  getGridView(List favEventsQueryList, List favOrgsQueryList) {
+  getGridView() {
     switch (typeIndex) {
       case 0:
         return StreamBuilder(
@@ -207,12 +205,8 @@ class my_favorite_screenState extends State<my_favorite_screen> {
             });
       case 1:
         return StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("Nonprofits")
-                .where("EIN",
-                    whereIn: favOrgsQueryList[
-                        lastLoadedFavOrgs]) //can only get first 10 items of array
-                .snapshots(),
+            stream:
+                FirebaseFirestore.instance.collection("Nonprofits").snapshots(),
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -220,7 +214,11 @@ class my_favorite_screenState extends State<my_favorite_screen> {
                 return Container();
               } else {
                 for (var i in snapshot.data!.docs) {
-                  favOrgList.add(NonProfitOrg.fromFirestore(i));
+                  for (var y in favOrgs) {
+                    if (i["EIN"] == y) {
+                      favOrgList.add(NonProfitOrg.fromFirestore(i));
+                    }
+                  }
                 }
 
                 return GridView.builder(
