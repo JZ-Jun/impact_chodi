@@ -23,11 +23,13 @@ class OrganizationWidget extends StatelessWidget {
 
             //Image.asset(img,fit: BoxFit.fill,width: 40, height: 40,),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              name,
-              style: const TextStyle(color: AppTheme.fontColor),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                name,
+                style: const TextStyle(color: AppTheme.fontColor),
+              ),
             ),
           )
         ],
