@@ -111,9 +111,9 @@ class _LineChartState extends State<LineChart> {
               var date = DateFormat('M-d').format(i["date"].toDate());
 
               if (i["IsEvent"] == true && i["showedUp"] == true) {
+                numberOfEvents++;
                 if (i["hours"].toDouble() > maxEventHours) {
                   maxEventHours = i["hours"].toDouble();
-                  numberOfEvents++;
                 }
                 totalHours += i["hours"].toDouble();
                 eventData.add(ChartData(date, i["hours"].toDouble()));

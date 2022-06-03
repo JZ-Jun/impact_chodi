@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chodi_app/models/activity.dart';
 import 'package:flutter_chodi_app/models/impact.dart';
@@ -20,7 +22,6 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../widget/clock/analog_clock.dart';
-
 
 //THIS IS NOT AN IDEAL SOLUTION, BUT IS THE ONLY WAY TO MAKE EVENT SCREEN WORK RIGHT NOW
 //TO GET RID OF THIS SHITTY CONST (Since it makes the list of events only successfully refresh whenever user
@@ -115,7 +116,7 @@ Future<List<dynamic>> _getSupportedOrganizations([dataField]) async {
 
 //navigate to detail_page.dart later
 List<Widget> _createOrganizationWidget(
-    BuildContext context, List<Impact>? impacts, List<NonProfitOrg> NGOs) {
+    BuildContext context, List<Impact> impacts, List<NonProfitOrg> NGOs) {
   var avatars = <Widget>[];
 
   if (impacts != null) {
@@ -124,7 +125,7 @@ List<Widget> _createOrganizationWidget(
     } else {
       //print(impacts);
       for (var i = 0; i < impacts.length; i++) {
-        if (i < 4) {
+        if (i < impacts.length) {
           //print(NGOs);
           avatars.add(ProfileAvatar(assetURL: NGOs[i].returnImpactImageURL()));
         } else {
@@ -137,7 +138,10 @@ List<Widget> _createOrganizationWidget(
   avatars.add(GestureDetector(
     onTap: () {
       Provider.of<MainScreenViewModel>(context, listen: false)
-          .setWidget(const OrganizationScreen());
+          .setWidget(OrganizationScreen(
+        Impacts: impacts,
+        NgoList: NGOList,
+      ));
     },
     child: SvgPicture.asset(
       "assets/svg/arrow_right.svg",
@@ -216,7 +220,6 @@ class _ImpactScreenState extends State<ImpactScreen>
 
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-
     //Grab the user information
     impactList = FirebaseFirestore.instance
         .collection("EndUsers")
@@ -227,7 +230,6 @@ class _ImpactScreenState extends State<ImpactScreen>
         .snapshots();
 
     allNGOs = FirebaseFirestore.instance.collection("Nonprofits").snapshots();
-
 
     controller = AnimationController(
       duration: const Duration(milliseconds: 1300),
@@ -291,7 +293,6 @@ class _ImpactScreenState extends State<ImpactScreen>
                     return Container();
                   } else if (snapshot.hasData) {
                     NGOList.clear();
-
 
                     for (var i in snapshot.data!.docs) {
                       NGOList.add(NonProfitOrg.fromFirestore(i));
@@ -399,8 +400,8 @@ class _ImpactScreenState extends State<ImpactScreen>
                                   Provider.of<MainScreenViewModel>(this.context,
                                           listen: false)
                                       .setWidget(RecentActivityScreen(
-                                    list: snapshot.data[0][0],
-                                    URLList: snapshot.data[0][4],
+                                    impact: Impacts,
+                                    NgoList: NGOList,
                                   ));
                                 },
                                 child: Row(
@@ -453,7 +454,7 @@ class _ImpactScreenState extends State<ImpactScreen>
                               padding: const EdgeInsets.only(top: 20),
                               child: Row(
                                 children: [
-                                  Text("Donated"),
+                                  const Text("Donated"),
                                   const Expanded(child: SizedBox()),
                                   Text(
                                     (totalDonations * animation.value)
@@ -468,7 +469,7 @@ class _ImpactScreenState extends State<ImpactScreen>
                                   const EdgeInsets.only(top: 20, bottom: 20),
                               child: Row(
                                 children: [
-                                  const Text("Participated Event"),
+                                  const Text("Participated Events"),
                                   const Expanded(child: SizedBox()),
                                   Text(eventsJoined.toString())
                                 ],
