@@ -96,11 +96,13 @@ class event_detail_page_state extends State<event_detail_page> {
 
   void _launchMaps() async {
     String address = '${widget.ngoEvent.address} ${widget.ngoEvent.city}, ${widget.ngoEvent.state}';
-    final Uri googleMapsURL = Uri.parse('https://www.google.com/maps/dir/Current+Location/${address}');
+    final Uri googleMapsURL = Uri.parse('https://www.google.com/maps?saddr=My+Location&daddr=${address}');
+    // final Uri googleMapsURL = Uri.parse('https://www.google.com/maps/dir/Current+Location/${address}');
     // final Uri googleMapsURL = Uri.parse('comgooglemaps://?center=${widget.ngoEvent.locationHelp}');
+    final Uri appleMapsURL = Uri.parse('http://maps.apple.com/?daddr=${address}&dirflg=d');
     // final Uri appleMapsURL = Uri.parse('http://maps.apple.com/?saddr=Current+Location&daddr=${address}');
-    final Uri appleMapsURL = Uri.parse('https://maps.apple.com/?q=${widget.ngoEvent.locationHelp}');
-
+    // final Uri appleMapsURL = Uri.parse('https://maps.apple.com/?q=${widget.ngoEvent.locationHelp}');
+    // 'http://maps.apple.com/?daddr=${address}&dirflg=d&t=h'
     if (await canLaunchUrl(googleMapsURL)) 
     {
       await launchUrl(googleMapsURL);
