@@ -357,10 +357,13 @@ class FirebaseService extends ChangeNotifier {
       CollectionReference favorites =
           FirebaseFirestore.instance.collection('Favorites');
 
+      // REMOVED FAVORITE FUNCTIONALITY B/C WE HAVE NO ACCESS TO FIREBASE DATABASE...
+      /*
       //assume Favorites doc is already created
       await favorites.doc(user.uid).update({
         'Favorite Events.$eventID': FieldValue.delete(),
       });
+      */
     }
   }
 

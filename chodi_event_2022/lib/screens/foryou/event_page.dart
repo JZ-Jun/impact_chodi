@@ -263,9 +263,12 @@ class event_page_state extends State<event_page> {
         }
       }
 
+      // REMOVED FAVORITE FUNCTIONALITY B/C WE HAVE NO ACCESS TO FIREBASE DATABASE...
+      /*
       if (_isThere == true) {
         _isFavorite = true;
       }
+      */
     } catch (e) {
       _isFavorite = false;
     }
@@ -330,7 +333,9 @@ class event_page_state extends State<event_page> {
                               onPressed: () {
                                 setState(() {
                                   _isFavorite = !_isFavorite;
-
+                                  
+                                  // REMOVED FAVORITE FUNCTIONALITY B/C WE HAVE NO ACCESS TO FIREBASE DATABASE...
+                                  /*
                                   if (_isFavorite) {
                                     //add to firebase
                                     fbservice.addUserFavoriteEvent(
@@ -349,6 +354,7 @@ class event_page_state extends State<event_page> {
                                         .removeUserFavoriteEventSubcollection(
                                             event.eventID);
                                   }
+                                  */
                                 });
                               },
                               icon: _isFavorite

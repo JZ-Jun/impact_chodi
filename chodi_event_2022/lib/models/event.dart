@@ -69,7 +69,7 @@ class Event {
     Map data = fbData.data() as Map;
 
     //print(data) ;
-
+    /*
     return Event(
       eventID: data['eventCode'],
       ein: data['EIN'] ?? '',
@@ -91,6 +91,34 @@ class Event {
       //    notes: data['Notes'] ?? '',
       //availableSpace: data['totalSpaceTaken'] ?? 0,
       totalSpace: data['totalSpace'] ?? 0,
+      //volunteers: data['Volunteers'] ?? {}
+    );
+    */
+    String coordinates = "[34.03721° N, 118.44283° W]";
+    String firstCoordinate = coordinates.split("°")[0].substring(1);
+    String secondCoordinate = coordinates.split("°")[1].substring(4);
+    return Event(
+      eventID: "61-1405123",
+      ein: "61-1405123",
+      name: "Adopting/Fostering",
+      orgName: "All Animal Rescue & Friends",
+      zip: 95046,
+      city: "San Martin",
+      state: "CA",
+      country: "USA",
+      address: "PO Box 941",
+      locationDescription: "San Martin, CA",
+      locationHelp: '${firstCoordinate},${secondCoordinate}',
+      attendees: {},
+      imageURL: data['imageURL'] ?? '',
+      // imageURL: "gs://chodi-663f2.appspot.com/nonprofitlogos/81-2661626.jpg",
+      description: "We are a 501(c)3 non-profit all volunteer rescue organization focused on physically rescuing and reuniting lost/found animals within our community.  We provide medical assistance and care to the injured, abused, neglected, abandoned and underaged animals.  We also rescue at-risk animals from local shelters. For the animals that come into our rescue, they are placed in safe, nurturing foster homes to prepare them for adoption.  We are dedicated to match each and every animal with the very best forever home.",
+      eventType: "Adopting",
+      startTime: Timestamp.fromDate(DateTime.now()),
+      endTime: Timestamp.fromDate(DateTime.now()),
+      //    notes: data['Notes'] ?? '',
+      //availableSpace: data['totalSpaceTaken'] ?? 0,
+      totalSpace: 3,
       //volunteers: data['Volunteers'] ?? {}
     );
   }

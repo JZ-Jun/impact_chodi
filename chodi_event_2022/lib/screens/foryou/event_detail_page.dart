@@ -1,4 +1,5 @@
 import 'dart:developer';
+// import 'dart:html';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -13,6 +14,7 @@ import 'package:rxdart/rxdart.dart';
 //import 'package:share_plus/share_plus.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/firebase_authentication_service.dart';
 
@@ -92,6 +94,29 @@ class event_detail_page_state extends State<event_detail_page> {
     endTime = DateFormat.jm().format(endDateStamp.toDate());
   }
 
+  void _launchMaps() async {
+    String address = '${widget.ngoEvent.address} ${widget.ngoEvent.city}, ${widget.ngoEvent.state}';
+    final Uri googleMapsURL = Uri.parse('https://www.google.com/maps?saddr=My+Location&daddr=${address}');
+    // final Uri googleMapsURL = Uri.parse('https://www.google.com/maps/dir/Current+Location/${address}');
+    // final Uri googleMapsURL = Uri.parse('comgooglemaps://?center=${widget.ngoEvent.locationHelp}');
+    final Uri appleMapsURL = Uri.parse('http://maps.apple.com/?daddr=${address}&dirflg=d');
+    // final Uri appleMapsURL = Uri.parse('http://maps.apple.com/?saddr=Current+Location&daddr=${address}');
+    // final Uri appleMapsURL = Uri.parse('https://maps.apple.com/?q=${widget.ngoEvent.locationHelp}');
+    // 'http://maps.apple.com/?daddr=${address}&dirflg=d&t=h'
+    if (await canLaunchUrl(googleMapsURL)) 
+    {
+      await launchUrl(googleMapsURL);
+    } 
+    else if (await canLaunchUrl(appleMapsURL))
+    {
+      await launchUrl(appleMapsURL);
+    }
+    else
+    {
+      throw "Could Not Launch Map Application.";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -109,12 +134,14 @@ class event_detail_page_state extends State<event_detail_page> {
             }
             */
 
+            // REMOVED FAVORITE FUNCTIONALITY B/C WE HAVE NO ACCESS TO FIREBASE DATABASE...
+            /*
             if (snapshot.data[0]!.docs.length == 1) {
               _isFavorite = true;
             } else {
               _isFavorite = false;
             }
-
+            */
             try {
               var _isRegistered = snapshot.data[1]!
                   .get("registeredFor")[widget.ngoEvent.eventID];
@@ -337,7 +364,8 @@ class event_detail_page_state extends State<event_detail_page> {
                                       onPressed: () {
                                         setState(() {
                                           _isFavorite = !_isFavorite;
-
+                                          // REMOVED FAVORITE FUNCTIONALITY B/C WE HAVE NO ACCESS TO FIREBASE DATABASE...
+                                          /*
                                           if (_isFavorite) {
                                             fbservice.addUserFavoriteEvent(
                                                 widget.ngoEIN,
@@ -355,6 +383,7 @@ class event_detail_page_state extends State<event_detail_page> {
                                                 .removeUserFavoriteEventSubcollection(
                                                     widget.ngoEvent.eventID);
                                           }
+                                          */
                                         });
                                       },
                                       icon: _isFavorite
@@ -409,13 +438,22 @@ class event_detail_page_state extends State<event_detail_page> {
                     const SizedBox(height: 30),
                     const Text('Location', style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 10),
-                    Text(
-                        '${widget.ngoEvent.address}\n${widget.ngoEvent.city}, ${widget.ngoEvent.state}\n${widget.ngoEvent.zip}\n${widget.ngoEvent.country}',
-                        style: const TextStyle(fontSize: 15)),
+                          InkWell( // MAP FUNCTIONALITY...
+                            onTap: _launchMaps,
+                            child: Row(children: [
+                              IconButton(
+                                icon: const Icon(Icons.location_on_outlined, color: Colors.blue),
+                                alignment: Alignment.topLeft,
+                                onPressed: _launchMaps),
+                              Text(
+                                '${widget.ngoEvent.address}\n${widget.ngoEvent.city}, ${widget.ngoEvent.state}\n${widget.ngoEvent.zip}\n${widget.ngoEvent.country}',
+                                style: const TextStyle(fontSize: 15, color: Colors.blue))
+                            ])
+                          ),
                     const SizedBox(height: 30),
                     const Text('Notes', style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 10),
-                    Text(widget.ngoEvent.locationHelp,
+                    Text('[${widget.ngoEvent.locationHelp.split(',')[0]}°N, ${widget.ngoEvent.locationHelp.split(',')[1]}°W]',
                         maxLines: descTextShowFlag2 ? 200 : 5,
                         textAlign: TextAlign.start),
                     InkWell(
