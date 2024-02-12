@@ -1,13 +1,19 @@
-A new Flutter project.
+# ChoDi
+An iOS and Android mobile application that connects non-profits, individuals, and corporations with each other to donate resources. 
 
-# chodi_login module.
-# chodi_impact module.
-# chodi_for you module.
-# chodi_message module.
-# chodi_events module.
-# chodi_profile module.
-# Front end development: Jun Zhu, Yuxi Ge, Yilin Li. 
-# Firebase: James,Ashley.
+# What's in the app (What we built)
+chodi_login module.
+chodi_impact module.
+chodi_for you module.
+chodi_message module.
+chodi_events module.
+chodi_profile module.
+
+# Out team:
+Team leader: Jun Zhu
+UI design: Jun Zhu
+Mobile development: Jun Zhu, Yuxi Ge, Yilin Li. 
+Firebase: James, Ashley.
 
 
 
